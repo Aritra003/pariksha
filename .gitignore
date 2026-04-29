@@ -27,6 +27,17 @@ yarn-error.log*
 
 # local env files
 .env*.local
+.env.local
+.env
+
+# Foundry
+out/
+cache/
+broadcast/
+lib/forge-std/
+
+# Secrets
+DEPLOYER_PRIVATE_KEY
 
 # vercel
 .vercel
