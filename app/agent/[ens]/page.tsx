@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowLeft, ExternalLink, Copy, Check, ChevronDown, ChevronUp } from 'lucide-react'
+import { ArrowLeft, ExternalLink, Copy, Check, ChevronDown, ChevronUp, RefreshCw } from 'lucide-react'
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
 } from 'recharts'
@@ -86,6 +86,9 @@ export default function AgentProfilePage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [promptOpen, setPromptOpen] = useState(false)
+  const [suchanaRunning, setSuchanaRunning] = useState(false)
+  const [suchanaResult, setSuchanaResult] = useState<{ findingsCount: number; corpusVersion: string } | null>(null)
+  const isAdmin = typeof window !== 'undefined' && window.location.search.includes('admin=1')
 
   useEffect(() => {
     fetch(`/api/agents/${encodeURIComponent(ens)}`)
@@ -347,6 +350,56 @@ export default function AgentProfilePage() {
               )}
             </div>
           )}
+        </div>
+
+        {/* ── Suchana corpus freshness ── */}
+        <div className="bg-panel border border-border-subtle rounded-2xl p-6">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <h2 className="font-display font-semibold text-base text-text-primary mb-1">Corpus Freshness</h2>
+              <p className="font-mono text-xs text-text-muted">
+                Version:{' '}
+                <span className="text-text-primary">
+                  {suchanaResult?.corpusVersion ?? agent.corpus_version ?? 'v1'}
+                </span>
+              </p>
+              {agent.corpus_version && (
+                <p className="font-mono text-[10px] text-text-muted mt-1">
+                  Last Suchana update: today
+                </p>
+              )}
+              {suchanaResult && (
+                <p className="font-mono text-xs text-accent-verified mt-2">
+                  ✓ {suchanaResult.findingsCount} findings indexed
+                </p>
+              )}
+            </div>
+            {isAdmin && (
+              <button
+                onClick={async () => {
+                  setSuchanaRunning(true)
+                  try {
+                    const r = await fetch('/api/suchana/run', { method: 'POST' })
+                    const d = await r.json()
+                    setSuchanaResult({ findingsCount: d.findingsCount ?? 0, corpusVersion: d.corpusVersion ?? 'v1' })
+                  } catch (e) {
+                    console.error('Suchana run error:', e)
+                  } finally {
+                    setSuchanaRunning(false)
+                  }
+                }}
+                disabled={suchanaRunning}
+                className={`font-mono text-xs px-3 py-1.5 rounded-lg border transition-all focus:outline-none focus-visible:ring-1 focus-visible:ring-accent-verified flex items-center gap-1.5 ${
+                  suchanaRunning
+                    ? 'border-border-subtle text-text-muted cursor-not-allowed'
+                    : 'border-border-subtle text-text-muted hover:text-text-primary hover:border-accent-verified/40'
+                }`}
+              >
+                <RefreshCw size={11} className={suchanaRunning ? 'animate-spin' : ''} />
+                {suchanaRunning ? 'Running…' : 'Run Suchana'}
+              </button>
+            )}
+          </div>
         </div>
       </div>
     </div>
