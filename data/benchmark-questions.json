@@ -1,0 +1,131 @@
+{
+  "_note": "TODO: Replace placeholder questions with verified Q&A pairs before demo recording. These are structural placeholders only.",
+  "delhi.in.pariksha.eth": [
+    {
+      "id": "delhi-001",
+      "question": "Under Section 138 of the Negotiable Instruments Act, what is the limitation period for filing a complaint after the cause of action arises?",
+      "goldenAnswer": "Under Section 142(b) of the NI Act, the complaint must be filed within one month of the date on which the cause of action arises under Section 138(c) — i.e., within one month of the failure to make payment within 15 days of receipt of the demand notice.",
+      "category": "limitation"
+    },
+    {
+      "id": "delhi-002",
+      "question": "In a commercial suit before the Delhi High Court, what is the pecuniary jurisdiction threshold under the Commercial Courts Act 2015?",
+      "goldenAnswer": "Under the Commercial Courts Act 2015 as amended, the specified value for commercial disputes in High Courts having original jurisdiction (including Delhi HC) is above Rs. 3 lakh (three lakh rupees) with effect from the 2018 amendment. The original threshold was Rs. 1 crore.",
+      "category": "jurisdiction"
+    },
+    {
+      "id": "delhi-003",
+      "question": "What is the Supreme Court's position on the doctrine of forum non conveniens in transnational commercial disputes involving Indian parties?",
+      "goldenAnswer": "The Supreme Court in Modi Entertainment Network v. W.S.G. Cricket Pte Ltd (2003) 4 SCC 341 held that Indian courts have jurisdiction where the cause of action arises in India but may decline jurisdiction on forum non conveniens principles. The court must balance natural forum factors against legitimate juridical advantages to the plaintiff.",
+      "category": "doctrine"
+    },
+    {
+      "id": "delhi-004",
+      "question": "Under the Arbitration and Conciliation Act 1996, can an Indian court grant interim relief under Section 9 after an arbitral tribunal has been constituted?",
+      "goldenAnswer": "Yes. Under Section 9(3) of the A&C Act (as amended in 2015), once an arbitral tribunal is constituted, the court shall not entertain an application under Section 9 unless the court finds that circumstances exist which may not render the remedy provided under Section 17 efficacious.",
+      "category": "arbitration"
+    },
+    {
+      "id": "delhi-005",
+      "question": "What constitutes 'just and equitable' grounds for winding up of a company under Section 271(e) of the Companies Act 2013?",
+      "goldenAnswer": "Section 271(e) of the Companies Act 2013 allows winding up if the tribunal is of the opinion that it is just and equitable to wind up the company. Courts apply this where: (i) substratum of the company has gone; (ii) there is deadlock in management; (iii) the company is a quasi-partnership and mutual trust has broken down; or (iv) the company was formed for a fraudulent or illegal purpose.",
+      "category": "corporate"
+    }
+  ],
+  "singapore.pariksha.eth": [
+    {
+      "id": "sg-001",
+      "question": "Under the SIAC Arbitration Rules 2016, what is the default timeline for constituting an emergency arbitral tribunal after an application is filed?",
+      "goldenAnswer": "Under Rule 30.3 of the SIAC Rules 2016, the President of the Court of Arbitration shall seek to appoint an Emergency Arbitrator within one (1) business day of receipt by the Registrar of the Emergency Arbitrator application and the application fee.",
+      "category": "procedure"
+    },
+    {
+      "id": "sg-002",
+      "question": "In Singapore, what is the test for setting aside an arbitral award on grounds of breach of natural justice under Section 24(b) of the International Arbitration Act?",
+      "goldenAnswer": "Per Soh Beng Teck & Co Pte Ltd v Fairmount Development Pte Ltd [2007] 3 SLR(R) 86, the test requires: (1) which rule of natural justice was breached; (2) how it was breached; (3) in what way the breach was connected to the making of the award; and (4) how the breach prejudiced the rights of the applicant. The prejudice must be actual, not theoretical.",
+      "category": "arbitration"
+    },
+    {
+      "id": "sg-003",
+      "question": "Under Singapore law, what is the Spiliada test for determining the appropriate forum in a conflict-of-laws dispute?",
+      "goldenAnswer": "The Spiliada test (adopted in Singapore in Rickshaw Investments v Nicolai Baron von Uexkull [2007] 1 SLR(R) 377) involves two stages: Stage 1 — whether there is another forum that is clearly or distinctly more appropriate than Singapore (natural forum); Stage 2 — even if there is, whether justice requires that Singapore courts should still exercise jurisdiction. Factors include connection of parties and facts to forum, governing law, and juridical advantages.",
+      "category": "conflict-of-laws"
+    },
+    {
+      "id": "sg-004",
+      "question": "What are the requirements for a valid exclusion clause to exclude liability for negligence under Singapore contract law?",
+      "goldenAnswer": "Under Singapore law applying Photo Production Ltd v Securicor Transport [1980] AC 827 and the Unfair Contract Terms Act (Cap 396), an exclusion clause must: (1) be incorporated into the contract (by signature, notice, or course of dealing); (2) on true construction, cover the breach that occurred; and (3) satisfy the reasonableness test under UCTA for B2C or certain B2B contracts. Courts construe exclusion clauses contra proferentem.",
+      "category": "contract"
+    },
+    {
+      "id": "sg-005",
+      "question": "Under the Singapore Companies Act, what is the threshold for a minority shareholder to bring a statutory derivative action?",
+      "goldenAnswer": "Under Section 216A of the Singapore Companies Act (Cap 50), a complainant who is a member holding not less than 5% of the issued shares, or a director of the company, may apply to the court for leave to bring a derivative action. The court must be satisfied that: (i) the complainant has given 14 days' notice to the directors; (ii) the complainant is acting in good faith; and (iii) it appears prima facie to be in the interests of the company.",
+      "category": "corporate"
+    }
+  ],
+  "difc.ae.pariksha.eth": [
+    {
+      "id": "difc-001",
+      "question": "Under the DIFC Contract Law (DIFC Law No. 6 of 2004), what is the standard for determining whether a party has accepted an offer by conduct?",
+      "goldenAnswer": "Under Article 15 of the DIFC Contract Law, acceptance may be signified by conduct if it is reasonable for the offeror to interpret the conduct as acceptance. The acceptance must be communicated to the offeror, except where the offer indicates that performance without notification constitutes acceptance.",
+      "category": "contract-formation"
+    },
+    {
+      "id": "difc-002",
+      "question": "In DIFC Courts, what is the procedure for recognising and enforcing a foreign arbitral award under the New York Convention?",
+      "goldenAnswer": "The UAE ratified the New York Convention in 2006. In the DIFC Courts, foreign arbitral awards may be recognized and enforced by filing a claim under Part 43 of the DIFC Courts Rules of Procedure. The court applies the Convention's Article V grounds for refusal. The DIFC is also a conduit jurisdiction — awards recognised in DIFC can be enforced across the UAE via the Judicial Tribune Agreement between DIFC Courts and Dubai Courts.",
+      "category": "enforcement"
+    },
+    {
+      "id": "difc-003",
+      "question": "What are the grounds for setting aside a DIFC-LCIA arbitral award under the DIFC Arbitration Law?",
+      "goldenAnswer": "Under Article 41 of the DIFC Arbitration Law (DIFC Law No. 1 of 2008), an award may be set aside if: (i) a party to the arbitration agreement was under some incapacity; (ii) the arbitration agreement is invalid; (iii) a party was not given proper notice or was otherwise unable to present its case; (iv) the award deals with matters beyond the scope of submission; (v) the composition of the tribunal was not in accordance with the agreement; or (vi) the award is in conflict with public policy of the DIFC.",
+      "category": "arbitration"
+    },
+    {
+      "id": "difc-004",
+      "question": "Under DIFC employment law, what is the minimum notice period for terminating an unlimited-term employment contract?",
+      "goldenAnswer": "Under Article 62 of the DIFC Employment Law (DIFC Law No. 2 of 2019), where an employer terminates an unlimited-term contract, the minimum notice period is: 30 days where employment has been less than 5 years; 60 days where employment has been 5 years or more. Parties may contract for longer notice periods. Payment in lieu of notice is permissible.",
+      "category": "employment"
+    },
+    {
+      "id": "difc-005",
+      "question": "What are the disclosure obligations of a company director under the DIFC Companies Law in respect of conflicts of interest?",
+      "goldenAnswer": "Under Article 58 of the DIFC Companies Law (DIFC Law No. 5 of 2018), a director who has a direct or indirect material interest in a transaction or arrangement with the company must declare the nature and extent of that interest to the board. The declaration must be made before the company enters into the transaction. A director who fails to declare forfeits any profit made and may be held liable for breach of fiduciary duty.",
+      "category": "corporate-governance"
+    }
+  ],
+  "ny.us.pariksha.eth": [
+    {
+      "id": "us-001",
+      "question": "Under New York contract law, what are the elements required to establish a breach of implied covenant of good faith and fair dealing?",
+      "goldenAnswer": "Under New York law (e.g., 511 W. 232nd Owners Corp. v. Jennifer Realty Co., 98 N.Y.2d 144 (2002)), a breach of the implied covenant of good faith and fair dealing claim requires: (1) the existence of a valid contract; (2) a party's performance of its obligations thereunder; (3) the other party's breach of the covenant; and (4) resulting damages. The covenant cannot be used to create obligations inconsistent with express contractual terms or to imply terms not expressed in the agreement.",
+      "category": "contract"
+    },
+    {
+      "id": "us-002",
+      "question": "Under SEC Rule 10b-5, what are the elements a plaintiff must prove in a private securities fraud action?",
+      "goldenAnswer": "Under Stoneridge Investment Partners v. Scientific-Atlanta, 552 U.S. 148 (2008) and prior precedent, a Rule 10b-5 private plaintiff must prove: (1) a material misrepresentation or omission; (2) scienter (intent to deceive or recklessness); (3) a connection with the purchase or sale of a security; (4) reliance (presumed under fraud-on-the-market theory for public companies per Basic Inc. v. Levinson); (5) economic loss; and (6) loss causation (the misrepresentation caused the loss).",
+      "category": "securities"
+    },
+    {
+      "id": "us-003",
+      "question": "In Delaware corporate law, what is the business judgment rule and when does it shift to the entire fairness standard?",
+      "goldenAnswer": "The business judgment rule in Delaware presumes that directors acted on an informed basis, in good faith, and in honest belief that the action was in the company's best interest (Smith v. Van Gorkom, 488 A.2d 858 (Del. 1985)). The standard shifts to entire fairness (fair dealing + fair price) when: (1) a majority of the board is interested or dominated; (2) in controller transactions; or (3) where board approval was not fully informed. MFW conditions can restore business judgment rule in controller buyouts.",
+      "category": "corporate"
+    },
+    {
+      "id": "us-004",
+      "question": "Under the FAA, on what grounds can a federal court vacate a commercial arbitration award?",
+      "goldenAnswer": "Under 9 U.S.C. § 10, a federal court may vacate an arbitration award where: (1) the award was procured by corruption, fraud, or undue means; (2) there was evident partiality or corruption in the arbitrators; (3) the arbitrators were guilty of misconduct in refusing to postpone the hearing, refusing to hear pertinent evidence, or other misbehavior prejudicing a party's rights; or (4) the arbitrators exceeded their powers or imperfectly executed them. Courts apply manifest disregard of the law in some circuits as an additional (non-statutory) ground.",
+      "category": "arbitration"
+    },
+    {
+      "id": "us-005",
+      "question": "What constitutes a 'material adverse change' (MAC) clause trigger in a New York-governed M&A agreement under recent case law?",
+      "goldenAnswer": "In Akorn, Inc. v. Fresenius Kabi AG (Del. Ch. 2018), the Delaware Court of Chancery (applying similar principles adopted in New York) held that a MAC must be measured against the long-term prospects of the company as a whole. A buyer must show: (1) a significant decline in target's business; (2) the decline is durationally significant (not short-term); and (3) the decline is not caused by an exception carved out in the MAC clause (such as general industry conditions). IBF v. Tyson Foods (2020) reaffirmed these principles.",
+      "category": "m-and-a"
+    }
+  ]
+}
