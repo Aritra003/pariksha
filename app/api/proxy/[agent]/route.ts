@@ -11,14 +11,6 @@ const AGENT_URL_MAP: Record<string, string | undefined> = {
   raksha: process.env.NYAYAMITRA_RAKSHA_PROXY_URL,
 }
 
-// Derives agent slug from the ENS name (e.g. "delhi.in.pariksha.eth" → "vidhi")
-function ensToSlug(ensName: string): string {
-  if (ensName.startsWith('raksha')) return 'raksha'
-  if (ensName.startsWith('kosh')) return 'kosh'
-  if (ensName.startsWith('sahayak')) return 'sahayak'
-  return 'vidhi'
-}
-
 async function fallbackToAnthropic(
   systemPrompt: string,
   query: string,

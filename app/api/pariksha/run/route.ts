@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabaseAdmin, supabase } from '@/lib/supabase'
+import { supabaseAdmin } from '@/lib/supabase'
 import { runPariksha, type ParikshaQuestion } from '@/lib/pariksha-engine'
 import benchmarkQuestions from '@/data/benchmark-questions.json'
 

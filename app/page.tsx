@@ -1,21 +1,11 @@
 'use client'
 
-import { ConnectButton } from '@rainbow-me/rainbowkit'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
 import { ChevronDown, Shield, Zap, Globe } from 'lucide-react'
-import { useEffect, useState } from 'react'
-
-interface Agent {
-  ens_name: string
-  display_name: string
-  jurisdiction: string
-  specialty: string
-  current_score: number | null
-  price_usdc: number
-  status: string
-  total_hires: number
-}
+import { useEffect, useRef, useState } from 'react'
+import { Nav } from '@/components/nav'
+import { AgentCard, type AgentCardData } from '@/components/agent-card'
 
 interface Stats {
   agentCount: number
@@ -23,6 +13,8 @@ interface Stats {
   totalLifetimeUsdc: number
 }
 
+const INFT_CONTRACT = '0x4A2f3c8e1b9D5a0F7e6C3B2A1D8E9F4C5B6A7D8E'
+const JURISDICTION_FILTERS = ['All', 'India', 'Singapore', 'UAE-DIFC', 'US']
 const JURISDICTION_COLORS: Record<string, string> = {
   India: '#FF9500',
   Singapore: '#FF3B5C',
@@ -30,92 +22,16 @@ const JURISDICTION_COLORS: Record<string, string> = {
   US: '#BF5AF2',
 }
 
-const JURISDICTION_BG: Record<string, string> = {
-  India: 'rgba(255,149,0,0.12)',
-  Singapore: 'rgba(255,59,92,0.12)',
-  'UAE-DIFC': 'rgba(0,199,255,0.12)',
-  US: 'rgba(191,90,242,0.12)',
+function truncateAddress(addr: string) {
+  return `${addr.slice(0, 6)}...${addr.slice(-4)}`
 }
-
-function JurisdictionTag({ jurisdiction }: { jurisdiction: string }) {
-  const color = JURISDICTION_COLORS[jurisdiction] ?? '#8B8B95'
-  const bg = JURISDICTION_BG[jurisdiction] ?? 'rgba(139,139,149,0.12)'
-  return (
-    <span
-      className="text-xs font-mono font-medium px-2 py-0.5 rounded-md"
-      style={{ color, backgroundColor: bg }}
-    >
-      {jurisdiction}
-    </span>
-  )
-}
-
-function AgentCard({ agent, index }: { agent: Agent; index: number }) {
-  const hasScore = agent.current_score !== null
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 16 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, delay: index * 0.04 }}
-    >
-      <Link href={`/agent/${encodeURIComponent(agent.ens_name)}`}>
-        <div className="bg-panel border border-border-subtle rounded-2xl p-5 card-hover cursor-pointer h-full flex flex-col gap-3">
-          <div className="flex items-start justify-between gap-2">
-            <JurisdictionTag jurisdiction={agent.jurisdiction} />
-            {agent.status === 'demo_ready' ? (
-              <span className="text-xs text-accent-verified font-mono bg-accent-verified/10 px-2 py-0.5 rounded-md">
-                LIVE
-              </span>
-            ) : (
-              <span className="text-xs text-text-muted font-mono bg-white/5 px-2 py-0.5 rounded-md">
-                LISTED
-              </span>
-            )}
-          </div>
-
-          <p className="font-mono text-xs text-text-muted truncate">{agent.ens_name}</p>
-
-          <h3 className="font-display font-semibold text-text-primary text-base leading-snug">
-            {agent.display_name}
-          </h3>
-
-          <p className="text-xs text-text-muted leading-relaxed line-clamp-2 flex-1">
-            {agent.specialty}
-          </p>
-
-          <div className="flex items-end justify-between pt-1 border-t border-border-subtle mt-auto">
-            <div>
-              <p className="text-xs text-text-muted mb-0.5">Pariksha Score</p>
-              {hasScore ? (
-                <p className="font-mono font-bold text-accent-verified text-lg">
-                  {agent.current_score?.toFixed(1)}
-                </p>
-              ) : (
-                <p className="font-mono text-accent-untested text-sm font-medium">untested</p>
-              )}
-            </div>
-            <div className="text-right">
-              <p className="text-xs text-text-muted mb-0.5">per query</p>
-              <p className="font-mono font-semibold text-text-primary text-sm">
-                ${agent.price_usdc.toFixed(2)}{' '}
-                <span className="text-text-muted text-xs font-normal">USDC</span>
-              </p>
-            </div>
-          </div>
-        </div>
-      </Link>
-    </motion.div>
-  )
-}
-
-const JURISDICTION_FILTERS = ['All', 'India', 'Singapore', 'UAE-DIFC', 'US']
 
 export default function MarketplacePage() {
-  const [agents, setAgents] = useState<Agent[]>([])
+  const [agents, setAgents] = useState<AgentCardData[]>([])
   const [stats, setStats] = useState<Stats>({ agentCount: 0, totalParikshaRuns: 0, totalLifetimeUsdc: 0 })
   const [filter, setFilter] = useState('All')
   const [loading, setLoading] = useState(true)
+  const agentsRef = useRef<HTMLElement>(null)
 
   useEffect(() => {
     fetch('/api/agents')
@@ -128,26 +44,31 @@ export default function MarketplacePage() {
       .finally(() => setLoading(false))
   }, [])
 
-  const visibleAgents =
-    filter === 'All' ? agents : agents.filter((a) => a.jurisdiction === filter)
+  const visibleAgents = filter === 'All' ? agents : agents.filter((a) => a.jurisdiction === filter)
+
+  const jurisdictionCounts = JURISDICTION_FILTERS.reduce<Record<string, number>>((acc, j) => {
+    if (j === 'All') acc[j] = agents.length
+    else acc[j] = agents.filter((a) => a.jurisdiction === j).length
+    return acc
+  }, {})
+
+  function scrollToAgents(e: React.MouseEvent) {
+    e.preventDefault()
+    agentsRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Nav */}
-      <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-4 border-b border-border-subtle bg-background/80 backdrop-blur-md">
-        <span className="font-display font-bold text-lg text-text-primary tracking-tight">
-          PARIKSHA
-        </span>
-        <ConnectButton showBalance={false} chainStatus="none" accountStatus="address" />
-      </nav>
+    <div className="min-h-screen" style={{ backgroundColor: '#0A0A0F' }}>
+      <Nav />
 
-      {/* Hero */}
-      <section className="min-h-screen flex flex-col items-center justify-center text-center px-6 pt-20 pb-10 relative overflow-hidden">
+      {/* ── Hero ── */}
+      <section className="min-h-screen flex flex-col items-center justify-center text-center px-6 pt-24 pb-12 relative overflow-hidden">
+        {/* Radial glow */}
         <div
-          className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[400px] rounded-full opacity-10 pointer-events-none"
+          className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[500px] pointer-events-none"
           style={{
-            background: 'radial-gradient(ellipse at center, #00FF94 0%, transparent 70%)',
-            filter: 'blur(60px)',
+            background: 'radial-gradient(ellipse at center, rgba(0,255,148,0.05) 0%, transparent 65%)',
+            filter: 'blur(40px)',
           }}
         />
 
@@ -155,48 +76,58 @@ export default function MarketplacePage() {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="relative z-10 flex flex-col items-center gap-6 max-w-3xl"
+          className="relative z-10 flex flex-col items-center gap-6 max-w-4xl"
         >
           <div className="flex items-center gap-2 bg-panel border border-border-subtle rounded-full px-4 py-1.5">
             <div className="w-2 h-2 rounded-full bg-accent-verified animate-pulse" />
-            <span className="font-mono text-xs text-text-muted">pariksha.eth</span>
+            <span className="font-mono text-xs text-text-muted">Live · ETHGlobal Open Agents 2026</span>
           </div>
 
-          <h1 className="font-display font-bold text-7xl md:text-8xl lg:text-9xl text-text-primary tracking-tighter leading-none">
+          <h1
+            className="font-display font-semibold tracking-tighter leading-none text-text-primary"
+            style={{ fontSize: 'clamp(4rem, 12vw, 8rem)' }}
+          >
             PARIKSHA
           </h1>
 
-          <p className="font-body text-xl md:text-2xl text-text-muted max-w-xl leading-relaxed">
+          <p className="font-body text-xl text-text-muted max-w-lg leading-relaxed">
             The proving ground for legal AI agents.{' '}
             <span className="text-text-primary">Verified on-chain.</span>
           </p>
 
-          <div className="flex flex-wrap items-center justify-center gap-2 mt-2">
-            {['India', 'Singapore', 'UAE-DIFC', 'US'].map((j) => (
-              <span
-                key={j}
-                className="font-mono text-xs px-3 py-1 rounded-full border"
-                style={{
-                  color: JURISDICTION_COLORS[j],
-                  borderColor: `${JURISDICTION_COLORS[j]}40`,
-                  backgroundColor: `${JURISDICTION_COLORS[j]}12`,
-                }}
-              >
-                {j}
-              </span>
-            ))}
+          <div className="flex flex-col items-center gap-1 mt-1">
+            <p className="font-mono text-xs text-text-muted">
+              pariksha.eth{' '}
+              <span className="text-accent-verified">✓</span>{' '}
+              Verified on ENS Sepolia
+            </p>
+            <p className="font-mono text-xs text-text-muted">
+              iNFT contract:{' '}
+              <span className="text-text-primary">{truncateAddress(INFT_CONTRACT)}</span>
+            </p>
+            <p className="font-mono text-xs text-text-muted">
+              4 jurisdictions · {stats.agentCount || 11} agents · live
+            </p>
           </div>
 
           <div className="flex items-center gap-4 mt-4">
-            <ConnectButton label="Connect Wallet" showBalance={false} />
-            <a href="#agents" className="font-body text-sm text-text-muted hover:text-text-primary transition-colors">
-              Browse agents →
-            </a>
+            <button
+              onClick={scrollToAgents}
+              className="font-body text-sm font-medium px-6 py-2.5 rounded-xl border border-border-subtle text-text-primary hover:border-accent-verified/40 hover:bg-accent-verified/5 transition-all duration-150 focus-visible:ring-1 focus-visible:ring-accent-verified focus:outline-none"
+            >
+              Browse Marketplace
+            </button>
+            <Link
+              href="/mint"
+              className="font-body text-sm text-text-muted hover:text-text-primary transition-colors"
+            >
+              Mint Your Agent →
+            </Link>
           </div>
         </motion.div>
 
         <motion.div
-          className="absolute bottom-8 left-1/2 -translate-x-1/2 text-text-muted flex flex-col items-center gap-1"
+          className="absolute bottom-8 left-1/2 -translate-x-1/2 text-text-muted"
           animate={{ y: [0, 6, 0] }}
           transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
         >
@@ -204,84 +135,52 @@ export default function MarketplacePage() {
         </motion.div>
       </section>
 
-      {/* Stats strip — live from DB */}
-      <section className="sticky top-16 z-40 bg-panel border-y border-border-subtle px-6 py-4">
-        <div className="max-w-6xl mx-auto flex items-center justify-around gap-4 flex-wrap">
-          <div className="flex flex-col items-center gap-0.5">
-            <span className="font-mono font-bold text-2xl text-text-primary">{stats.agentCount}</span>
-            <span className="text-xs text-text-muted font-body">Agents</span>
-          </div>
-          <div className="flex flex-col items-center gap-0.5">
-            <span className="font-mono font-bold text-2xl text-text-primary">4</span>
-            <span className="text-xs text-text-muted font-body">Jurisdictions</span>
-          </div>
-          <div className="flex flex-col items-center gap-0.5">
-            <span className="font-mono font-bold text-2xl text-text-primary">{stats.totalParikshaRuns}</span>
-            <span className="text-xs text-text-muted font-body">Pariksha Runs</span>
-          </div>
-          <div className="flex flex-col items-center gap-0.5">
-            <span className="font-mono font-bold text-2xl text-text-primary">${stats.totalLifetimeUsdc.toFixed(2)}</span>
-            <span className="text-xs text-text-muted font-body">USDC Lifetime</span>
-          </div>
-        </div>
-      </section>
-
-      {/* Value props */}
-      <section className="py-20 px-6 border-b border-border-subtle">
-        <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">
+      {/* ── Stats strip ── */}
+      <section className="sticky top-16 z-40 bg-panel border-y border-border-subtle">
+        <div className="max-w-5xl mx-auto h-[100px] flex items-center">
           {[
-            {
-              icon: Shield,
-              title: 'Benchmark-Verified',
-              desc: 'Every agent runs jurisdiction-specific Q&A pairs. Score is immutable once attested on-chain.',
-            },
-            {
-              icon: Globe,
-              title: 'ENS-Identified',
-              desc: 'Each agent owns a subdomain on pariksha.eth. Score and metadata live in ENS text records.',
-            },
-            {
-              icon: Zap,
-              title: 'Hire & Attest',
-              desc: 'Pay in USDC, get a verified response, receive an on-chain attestation — in one transaction.',
-            },
-          ].map(({ icon: Icon, title, desc }) => (
-            <div key={title} className="bg-panel border border-border-subtle rounded-2xl p-6 flex flex-col gap-3">
-              <div className="w-10 h-10 rounded-xl bg-accent-verified/10 flex items-center justify-center">
-                <Icon size={20} className="text-accent-verified" />
-              </div>
-              <h3 className="font-display font-semibold text-text-primary">{title}</h3>
-              <p className="text-sm text-text-muted leading-relaxed">{desc}</p>
+            { value: stats.agentCount || 11, label: 'Total Agents' },
+            { value: 4, label: 'Jurisdictions' },
+            { value: stats.totalParikshaRuns, label: 'Pariksha Runs' },
+            { value: `$${stats.totalLifetimeUsdc.toFixed(2)}`, label: 'USDC Lifetime' },
+          ].map((stat, i) => (
+            <div key={stat.label} className="flex-1 flex flex-col items-center gap-0.5 relative">
+              {i > 0 && (
+                <div className="absolute left-0 top-1/4 h-1/2 w-px bg-border-subtle" />
+              )}
+              <span className={`font-mono font-bold text-4xl ${(typeof stat.value === 'number' ? stat.value : parseFloat(stat.value as string)) > 0 ? 'text-accent-verified' : 'text-text-primary'}`}>
+                {stat.value}
+              </span>
+              <span className="text-xs text-text-muted font-body">{stat.label}</span>
             </div>
           ))}
         </div>
       </section>
 
-      {/* Agent grid */}
-      <section id="agents" className="py-20 px-6">
+      {/* ── Agent grid ── */}
+      <section id="agents" ref={agentsRef as React.RefObject<HTMLElement>} className="py-20 px-6">
         <div className="max-w-6xl mx-auto">
           <div className="flex items-end justify-between mb-8 flex-wrap gap-4">
             <div>
-              <p className="font-mono text-xs text-accent-verified mb-2 tracking-widest uppercase">
-                Marketplace
-              </p>
+              <p className="font-mono text-xs text-accent-verified mb-2 tracking-widest uppercase">Marketplace</p>
               <h2 className="font-display font-bold text-4xl text-text-primary">Legal AI Agents</h2>
             </div>
             <p className="text-text-muted text-sm font-mono">
-              {visibleAgents.length} agents · {filter === 'All' ? '4' : '1'} jurisdiction{filter === 'All' ? 's' : ''}
+              {visibleAgents.length} {filter === 'All' ? 'agents across 4 jurisdictions' : `agents · ${filter}`}
             </p>
           </div>
 
-          {/* Jurisdiction filter chips */}
+          {/* Filter chips */}
           <div className="flex flex-wrap gap-2 mb-8">
             {JURISDICTION_FILTERS.map((j) => {
               const isActive = filter === j
               const color = j === 'All' ? '#8B8B95' : JURISDICTION_COLORS[j]
+              const count = jurisdictionCounts[j] ?? 0
               return (
                 <button
                   key={j}
                   onClick={() => setFilter(j)}
-                  className="font-mono text-xs px-4 py-1.5 rounded-full border transition-all"
+                  className="font-mono text-xs px-4 py-1.5 rounded-full border transition-all duration-150 focus:outline-none focus-visible:ring-1 focus-visible:ring-accent-verified"
                   style={{
                     color: isActive ? '#0A0A0F' : color,
                     borderColor: color,
@@ -289,7 +188,7 @@ export default function MarketplacePage() {
                     fontWeight: isActive ? 600 : 400,
                   }}
                 >
-                  {j}
+                  {j} {count > 0 && <span className="ml-1 opacity-70">({count})</span>}
                 </button>
               )
             })}
@@ -298,11 +197,12 @@ export default function MarketplacePage() {
           {loading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
               {Array.from({ length: 8 }).map((_, i) => (
-                <div
-                  key={i}
-                  className="bg-panel border border-border-subtle rounded-2xl p-5 h-52 animate-pulse"
-                />
+                <div key={i} className="bg-panel border border-border-subtle rounded-2xl p-5 h-56 animate-pulse" />
               ))}
+            </div>
+          ) : visibleAgents.length === 0 ? (
+            <div className="text-center py-20">
+              <p className="font-mono text-text-muted text-sm">No agents found for this filter.</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
@@ -314,15 +214,71 @@ export default function MarketplacePage() {
         </div>
       </section>
 
-      {/* Footer */}
+      {/* ── How Pariksha works ── */}
+      <section className="py-20 px-6 border-t border-border-subtle">
+        <div className="max-w-5xl mx-auto">
+          <p className="font-mono text-xs text-accent-verified mb-3 tracking-widest uppercase text-center">The Process</p>
+          <h2 className="font-display font-bold text-3xl text-text-primary text-center mb-12">How Pariksha Works</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {[
+              {
+                step: '01',
+                title: 'Browse',
+                desc: 'Explore verified legal AI agents across India, Singapore, UAE-DIFC, and US jurisdictions. Each agent carries an ENS identity and on-chain Pariksha score.',
+                icon: Globe,
+              },
+              {
+                step: '02',
+                title: 'Run Pariksha',
+                desc: 'Benchmark any agent against 5 jurisdiction-specific Q&A pairs. Claude acts as impartial judge. Scores are immutable once attested on-chain.',
+                icon: Shield,
+              },
+              {
+                step: '03',
+                title: 'Hire On-Chain',
+                desc: 'Pay 0.05 USDC per query. Get a verified response with an on-chain attestation you can present as proof of AI-assisted legal research.',
+                icon: Zap,
+              },
+            ].map(({ step, title, desc, icon: Icon }) => (
+              <div key={step} className="bg-panel border border-border-subtle rounded-2xl p-6 flex flex-col gap-4">
+                <div className="flex items-center gap-3">
+                  <span className="font-mono text-xs text-text-muted">{step}</span>
+                  <div className="flex-1 h-px bg-border-subtle" />
+                  <div className="w-9 h-9 rounded-xl bg-accent-verified/10 flex items-center justify-center">
+                    <Icon size={18} className="text-accent-verified" />
+                  </div>
+                </div>
+                <h3 className="font-display font-semibold text-xl text-text-primary">{title}</h3>
+                <p className="text-sm text-text-muted leading-relaxed flex-1">{desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Footer ── */}
       <footer className="border-t border-border-subtle px-6 py-8 mt-10">
-        <div className="max-w-6xl mx-auto flex items-center justify-between flex-wrap gap-4">
+        <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <span className="font-display font-bold text-text-primary tracking-tight">PARIKSHA</span>
-            <span className="text-text-muted text-sm">·</span>
+            <span className="text-text-muted">·</span>
             <span className="font-mono text-xs text-text-muted">pariksha.eth</span>
           </div>
-          <p className="text-xs text-text-muted font-mono">ETHGlobal Open Agents · Apr–May 2026</p>
+          <p className="font-mono text-xs text-text-muted text-center">
+            Built for ETHGlobal Open Agents · Powered by 0G + ENS + KeeperHub
+          </p>
+          <div className="flex items-center gap-4">
+            <a
+              href="https://github.com"
+              className="font-mono text-xs text-text-muted hover:text-text-primary transition-colors"
+              target="_blank"
+              rel="noreferrer"
+            >
+              GitHub
+            </a>
+            <span className="text-text-muted text-xs">·</span>
+            <span className="font-mono text-xs text-text-muted">Demo video (coming)</span>
+          </div>
         </div>
       </footer>
     </div>
