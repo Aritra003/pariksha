@@ -1,5 +1,6 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import { RainbowKitProvider, getDefaultConfig, darkTheme } from '@rainbow-me/rainbowkit'
 import { WagmiProvider } from 'wagmi'
 import { sepolia, baseSepolia } from 'wagmi/chains'
@@ -16,6 +17,12 @@ const config = getDefaultConfig({
 const queryClient = new QueryClient()
 
 export function Providers({ children }: { children: React.ReactNode }) {
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
   return (
     <WagmiProvider config={config}>
       <QueryClientProvider client={queryClient}>
@@ -24,10 +31,9 @@ export function Providers({ children }: { children: React.ReactNode }) {
             accentColor: '#00FF94',
             accentColorForeground: '#0A0A0F',
             borderRadius: 'medium',
-            fontStack: 'system',
           })}
         >
-          {children}
+          {mounted ? children : null}
         </RainbowKitProvider>
       </QueryClientProvider>
     </WagmiProvider>

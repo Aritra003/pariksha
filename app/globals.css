@@ -1,137 +1,33 @@
-@import "tw-animate-css";
-@import "shadcn/tailwind.css";
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-/* Google Fonts */
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap');
-
 @layer base {
-  :root {
-    /* Pariksha dark-only design system */
-    --background: #0A0A0F;
-    --foreground: #F5F5F7;
-    --card: #14141A;
-    --card-foreground: #F5F5F7;
-    --popover: #14141A;
-    --popover-foreground: #F5F5F7;
-    --primary: #00FF94;
-    --primary-foreground: #0A0A0F;
-    --secondary: #2A2A35;
-    --secondary-foreground: #F5F5F7;
-    --muted: #14141A;
-    --muted-foreground: #8B8B95;
-    --accent: #00FF94;
-    --accent-foreground: #0A0A0F;
-    --destructive: #FF3B5C;
-    --border: #2A2A35;
-    --input: #2A2A35;
-    --ring: #00FF94;
-    --radius: 1rem;
-
-    /* Pariksha custom tokens */
-    --panel: #14141A;
-    --border-subtle: #2A2A35;
-    --text-primary: #F5F5F7;
-    --text-muted: #8B8B95;
-    --accent-verified: #00FF94;
-    --accent-untested: #FF3B5C;
-    --accent-rare: #D4AF37;
-    --jurisdiction-india: #FF9500;
-    --jurisdiction-singapore: #FF3B5C;
-    --jurisdiction-difc: #00C7FF;
-    --jurisdiction-us: #BF5AF2;
-  }
-
-  .dark {
-    --background: #0A0A0F;
-    --foreground: #F5F5F7;
-    --card: #14141A;
-    --card-foreground: #F5F5F7;
-    --popover: #14141A;
-    --popover-foreground: #F5F5F7;
-    --primary: #00FF94;
-    --primary-foreground: #0A0A0F;
-    --secondary: #2A2A35;
-    --secondary-foreground: #F5F5F7;
-    --muted: #14141A;
-    --muted-foreground: #8B8B95;
-    --accent: #00FF94;
-    --accent-foreground: #0A0A0F;
-    --destructive: #FF3B5C;
-    --border: #2A2A35;
-    --input: #2A2A35;
-    --ring: #00FF94;
-  }
-
-  * {
-    @apply border-border outline-ring/50;
-    box-sizing: border-box;
-  }
-
-  html {
-    color-scheme: dark;
-    scroll-behavior: smooth;
-  }
-
-  body {
-    @apply bg-background text-foreground;
-    font-family: 'Inter', sans-serif;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-  }
-
-  ::selection {
-    background-color: #00FF94;
-    color: #0A0A0F;
-  }
+:root {
+--background: 240 13% 5%;
+--panel: 240 13% 9%;
+--border-subtle: 240 13% 19%;
+--text-primary: 240 14% 96%;
+--text-muted: 240 6% 56%;
+--accent-verified: 153 100% 50%;
+--accent-untested: 350 95% 60%;
+--accent-rare: 46 65% 53%;
+--jurisdiction-india: 32 100% 50%;
+--jurisdiction-singapore: 350 95% 60%;
+--jurisdiction-difc: 196 100% 50%;
+--jurisdiction-us: 277 84% 65%;
+}
+html {
+color-scheme: dark;
+}
+body {
+background-color: hsl(var(--background));
+color: hsl(var(--text-primary));
+font-family: var(--font-body), system-ui, sans-serif;
+-webkit-font-smoothing: antialiased;
+-moz-osx-font-smoothing: grayscale;
 }
 
-@layer utilities {
-  .font-display {
-    font-family: 'Space Grotesk', sans-serif;
-  }
-
-  .font-body {
-    font-family: 'Inter', sans-serif;
-  }
-
-  .font-mono {
-    font-family: 'JetBrains Mono', monospace;
-  }
-
-  .text-gradient-mint {
-    background: linear-gradient(135deg, #00FF94 0%, #00C7FF 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-
-  .card-hover {
-    transition: transform 150ms ease, border-color 150ms ease;
-  }
-
-  .card-hover:hover {
-    transform: translateY(-2px);
-    border-color: #00FF94;
-  }
-
-  .glow-mint {
-    box-shadow: 0 0 30px rgba(0, 255, 148, 0.12);
-  }
-
-  .scrollbar-hide::-webkit-scrollbar {
-    display: none;
-  }
-
-  .scrollbar-hide {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
-
-  .text-balance {
-    text-wrap: balance;
-  }
+{
+border-color: hsl(var(--border-subtle));
+}
 }

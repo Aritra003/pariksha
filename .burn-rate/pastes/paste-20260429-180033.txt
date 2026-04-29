@@ -1,0 +1,646 @@
+<ide_selection>The user selected the lines 1 to 322 from /Users/aritrasarkhel/Desktop/ETH Items/files/CLAUDE.md:
+# CLAUDE.md — Pariksha Build Context
+
+This file is the master context for the Pariksha hackathon build. Read this fully before any code change.
+
+## What I'm building
+
+**Pariksha** — an on-chain proving ground and marketplace for jurisdiction-specific legal AI agents. Each agent is an iNFT (ERC-7857) on 0G Storage with verifiable benchmark scores, a human-readable ENS identity, and atomic hire-and-attest execution via KeeperHub.
+
+**Submission for:** ETHGlobal Open Agents hackathon (Apr 24 – May 3, 2026)
+**Prize tracks targeted:** 0G iNFT track ($7.5K), ENS AI Agent Integration ($2.5K), KeeperHub Best Use ($4.5K + $250 feedback bonus)
+**Build time available:** ~10 hours
+
+## Builder context
+
+I am Aritra Sarkhel. I am NOT a deeply technical engineer. I built NyayaMitra previously with help from Claude Code. NyayaMitra is a live legal AI product with 11 specialized agents (Vidhi, Kosh, Sahayak, Raksha, Prakriya, Suchana, Ganit, Bhasha, Setu, Vichar, Pipeline) running on FastAPI + PostgreSQL + Neo4j + Railway. Pariksha is a NEW project that wraps the existing NyayaMitra agents in an on-chain marketplace layer.
+
+**Critical:** Pariksha is in a SEPARATE folder from NyayaMitra. Pariksha calls NyayaMitra agents over HTTP via a proxy. We do not modify NyayaMitra source code. We do not paste NyayaMitra source code into the Pariksha repo.
+
+## Tech stack (locked — do not change)
+
+- **Frontend + Backend:** Next.js 14 (App Router) + TypeScript + Tailwind + shadcn/ui
+- **Wallet/chain:** wagmi + viem + RainbowKit
+- **Database:** Supabase (Postgres)
+- **Smart contracts:** Solidity + Foundry
+- **Storage (offchain):** 0G Storage SDK
+- **Deploy:** Vercel
+- **Chains:** Sepolia (ENS), Base Sepolia (USDC + KeeperHub), 0G Galileo testnet (iNFT)
+- **Agent backend:** Existing NyayaMitra FastAPI (Railway) accessed via proxy
+- **Judge AI:** Anthropic Claude Sonnet 4.5 (for Pariksha benchmark scoring)
+
+## Core principles when writing code
+
+1. **Vertical slices, not horizontal layers.** Get one agent fully end-to-end before adding more.
+2. **No new agent backends.** Pariksha is a wrapper. Agent logic = existing NyayaMitra endpoints.
+3. **Mock cleanly when needed.** If 0G testnet has issues, fall back to ERC-721 on Base Sepolia and document the fallback in code comments.
+4. **Keep it minimal.** Hackathon code, not production. Five tables in Supabase. Five frontend pages. Three smart contracts max.
+5. **Always commit and deploy after each prompt.** Working deployable thing at every checkpoint.
+6. **Cost discipline.** Total Claude Code budget: $20. If a single task costs more than $5, escalate and ask for guidance.
+
+## Design system (apply universally)
+
+```
+Background dark:     #0A0A0F
+Background panel:    #14141A
+Border subtle:       #2A2A35
+Text primary:        #F5F5F7
+Text muted:          #8B8B95
+
+Accent verified:     #00FF94    (electric mint — only for verified scores)
+Accent untested:     #FF3B5C    (signal red — for "untested" / warnings)
+Accent rare:         #D4AF37    (gold — premium badges only)
+
+Jurisdiction tags:
+  India:             #FF9500
+  Singapore:         #FF3B5C
+  UAE-DIFC:          #00C7FF
+  US:                #BF5AF2
+
+Fonts (Google Fonts):
+  Display:           Space Grotesk
+  Body:              Inter
+  Mono:              JetBrains Mono
+```
+
+**Layout rules:**
+- Min 80px padding between major sections
+- Cards: `bg-[#14141A]` with `border border-[#2A2A35]` and `rounded-2xl`
+- Numbers (scores, USDC, days): mono font, large, dominant
+- Hover state on cards: `translate-y-[-2px]` + accent border
+- One screaming accent per screen — usually the verified score
+
+## Schema (Supabase)
+
+```sql
+CREATE TABLE agents (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  ens_name TEXT UNIQUE NOT NULL,
+  display_name TEXT NOT NULL,
+  jurisdiction TEXT NOT NULL,
+  specialty TEXT NOT NULL,
+  inft_address TEXT,
+  inft_token_id TEXT,
+  owner_address TEXT,
+  backend_endpoint TEXT NOT NULL,
+  system_prompt TEXT,
+  price_usdc NUMERIC NOT NULL,
+  current_score NUMERIC,
+  total_hires INTEGER DEFAULT 0,
+  total_pariksha_runs INTEGER DEFAULT 0,
+  lifetime_usdc_earned NUMERIC DEFAULT 0,
+  training_examples_count INTEGER DEFAULT 0,
+  corpus_version TEXT DEFAULT 'v1',
+  status TEXT DEFAULT 'listed', -- 'listed' | 'demo_ready' | 'live'
+  minted_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+
+CREATE TABLE pariksha_runs (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  agent_ens TEXT NOT NULL REFERENCES agents(ens_name),
+  questions JSONB NOT NULL,
+  agent_answers JSONB NOT NULL,
+  golden_answers JSONB NOT NULL,
+  per_question_scores JSONB NOT NULL,
+  final_score NUMERIC NOT NULL,
+  judge_reasoning TEXT,
+  attestation_tx_hash TEXT,
+  run_at TIMESTAMPTZ DEFAULT now()
+);
+
+CREATE TABLE hires (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  agent_ens TEXT NOT NULL REFERENCES agents(ens_name),
+  buyer_address TEXT NOT NULL,
+  query TEXT NOT NULL,
+  response TEXT NOT NULL,
+  usdc_paid NUMERIC NOT NULL,
+  payment_tx_hash TEXT,
+  attestation_tx_hash TEXT,
+  hired_at TIMESTAMPTZ DEFAULT now()
+);
+
+CREATE TABLE training_data (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  agent_ens TEXT NOT NULL REFERENCES agents(ens_name),
+  query TEXT NOT NULL,
+  response TEXT NOT NULL,
+  feedback_score NUMERIC,
+  zerog_storage_pointer TEXT,
+  stored_at TIMESTAMPTZ DEFAULT now()
+);
+
+CREATE TABLE badges (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  agent_ens TEXT NOT NULL REFERENCES agents(ens_name),
+  badge_type TEXT NOT NULL, -- 'verified' | 'veteran' | 'excellence' | 'polyglot' | 'specialist'
+  badge_token_id TEXT,
+  threshold_data JSONB,
+  minted_at TIMESTAMPTZ DEFAULT now()
+);
+```
+
+## Demo agent seed data (initial 4 demo-ready agents, 7 listed)
+
+```typescript
+const DEMO_READY_AGENTS = [
+  {
+    ens_name: "delhi.in.pariksha.eth",
+    display_name: "Vidhi — Delhi HC",
+    jurisdiction: "India",
+    specialty: "Delhi High Court commercial litigation, Section 138 NI Act",
+    backend_endpoint: process.env.NYAYAMITRA_VIDHI_PROXY_URL,
+    system_prompt: "You are Vidhi, NyayaMitra's legal research agent. You specialize in Delhi High Court commercial litigation. Cite only verified Indian case law. If uncertain, say so explicitly. Apply the RAG Grounding Directive: never fabricate legislation, never conflate holdings, never paraphrase past the source.",
+    price_usdc: 0.05,
+    status: "demo_ready"
+  },
+  {
+    ens_name: "singapore.pariksha.eth",
+    display_name: "Vidhi — Singapore",
+    jurisdiction: "Singapore",
+    specialty: "SIAC international commercial arbitration",
+    backend_endpoint: process.env.NYAYAMITRA_VIDHI_PROXY_URL,
+    system_prompt: "You are Vidhi, specialized in Singapore International Arbitration Centre matters. Apply Singapore International Arbitration Act framework. Cite verified SIAC awards and Singapore High Court decisions only.",
+    price_usdc: 0.05,
+    status: "demo_ready"
+  },
+  {
+    ens_name: "difc.ae.pariksha.eth",
+    display_name: "Vidhi — UAE-DIFC",
+    jurisdiction: "UAE-DIFC",
+    specialty: "DIFC commercial contracts, English common law",
+    backend_endpoint: process.env.NYAYAMITRA_VIDHI_PROXY_URL,
+    system_prompt: "You are Vidhi, specialized in DIFC commercial law. Apply DIFC Contract Law and English common law principles. Cite verified DIFC Courts decisions.",
+    price_usdc: 0.05,
+    status: "demo_ready"
+  },
+  {
+    ens_name: "ny.us.pariksha.eth",
+    display_name: "Vidhi — US Commercial",
+    jurisdiction: "US",
+    specialty: "US commercial contracts, securities",
+    backend_endpoint: process.env.NYAYAMITRA_VIDHI_PROXY_URL,
+    system_prompt: "You are Vidhi, specialized in US commercial contract law and securities regulation. Cite verified US case law from federal and state appellate courts. Note jurisdictional variations.",
+    price_usdc: 0.05,
+    status: "demo_ready"
+  }
+];
+
+const LISTED_AGENTS = [
+  // Kosh, Sahayak, Raksha, Prakriya, Bhasha, Suchana — to be filled in via PROMPT-06
+];
+```
+
+## Environment variables required
+
+```
+# Supabase
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
+SUPABASE_SERVICE_KEY=
+
+# WalletConnect / RainbowKit
+NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID=
+
+# Anthropic (for judge agent)
+ANTHROPIC_API_KEY=
+
+# NyayaMitra proxy (your existing backend)
+NYAYAMITRA_VIDHI_PROXY_URL=
+NYAYAMITRA_KOSH_PROXY_URL=
+NYAYAMITRA_SAHAYAK_PROXY_URL=
+NYAYAMITRA_RAKSHA_PROXY_URL=
+NYAYAMITRA_PROXY_API_KEY=
+
+# Smart contracts (set after deploy)
+NEXT_PUBLIC_INFT_CONTRACT_ADDRESS=
+NEXT_PUBLIC_BADGE_CONTRACT_ADDRESS=
+NEXT_PUBLIC_ATTESTATION_CONTRACT_ADDRESS=
+
+# Chain configs
+NEXT_PUBLIC_SEPOLIA_RPC=https://sepolia.drpc.org
+NEXT_PUBLIC_BASE_SEPOLIA_RPC=https://sepolia.base.org
+NEXT_PUBLIC_ZEROG_GALILEO_RPC=
+NEXT_PUBLIC_USDC_BASE_SEPOLIA=0x036CbD53842c5426634e7929541eC2318f3dCF7e
+
+# KeeperHub
+KEEPERHUB_API_KEY=
+
+# Deploy private key (Foundry only — never frontend)
+DEPLOYER_PRIVATE_KEY=
+```
+
+## File structure
+
+```
+pariksha/
+├── CLAUDE.md                       (this file)
+├── .env.local                      (secrets — never commit)
+├── .gitignore
+├── package.json
+├── pnpm-lock.yaml
+├── next.config.js
+├── tailwind.config.ts
+├── tsconfig.json
+├── README.md
+├── FEEDBACK.md                     (KeeperHub bonus)
+│
+├── app/
+│   ├── layout.tsx
+│   ├── page.tsx                    (marketplace landing)
+│   ├── globals.css
+│   ├── providers.tsx               (wagmi, RainbowKit)
+│   ├── agent/[ens]/page.tsx       (agent profile)
+│   ├── pariksha/[ens]/page.tsx    (run benchmark)
+│   ├── hire/[ens]/page.tsx        (hire flow)
+│   └── api/
+│       ├── agents/route.ts
+│       ├── agents/[ens]/route.ts
+│       ├── pariksha/run/route.ts
+│       ├── hire/route.ts
+│       ├── proxy/[agent]/route.ts  (NyayaMitra proxy)
+│       └── suchana/run/route.ts    (daily research cron)
+│
+├── components/
+│   ├── ui/                         (shadcn/ui generated)
+│   ├── agent-card.tsx
+│   ├── score-display.tsx           (the count-up animation)
+│   ├── jurisdiction-tag.tsx
+│   ├── ens-pill.tsx
+│   └── nav.tsx
+│
+├── lib/
+│   ├── supabase.ts
+│   ├── ens.ts
+│   ├── contracts/
+│   │   ├── inft.ts
+│   │   ├── badge.ts
+│   │   └── abis.ts
+│   ├── pariksha-engine.ts          (judge logic)
+│   ├── proxy.ts                    (NyayaMitra calls)
+│   ├── keeperhub.ts
+│   └── utils.ts
+│
+├── contracts/
+│   ├── PariksaINFT.sol
+│   ├── PariksaBadge.sol
+│   └── ParikshaAttestation.sol
+│
+├── foundry.toml
+├── script/
+│   └── Deploy.s.sol
+│
+├── data/
+│   ├── benchmark-questions.json    (90 Q&A pairs)
+│   └── seed-agents.json
+│
+└── public/
+    ├── pariksha-logo.svg
+    └── favicon.ico
+```
+
+## Acceptance criteria for "done"
+
+The hackathon submission is done when:
+- [ ] `pnpm dev` runs without errors
+- [ ] Marketplace page renders 11 agents (4 demo-ready, 7 listed)
+- [ ] Click into an agent → profile page renders with iNFT data + score history
+- [ ] Click "Run Pariksha" → benchmark runs, score lands on-chain (or in DB if 0G fallback), updates ENS text record
+- [ ] Click "Hire" → wallet prompts for USDC payment → KeeperHub call → query response → attestation
+- [ ] Raksha demo flow works (5 personas + judge)
+- [ ] Vercel deployment is live at production URL
+- [ ] Demo video uploaded
+- [ ] GitHub repo is public, README is complete, FEEDBACK.md exists
+- [ ] ETHGlobal submission is filed with 3 partner prizes selected
+
+## When in doubt
+
+- Pick the simpler option
+- Mock and document, don't block
+- Ship slice 1+2 (one agent end-to-end) over slice 5 (everything but broken)
+- Ask before adding any feature not in this doc
+
+
+This may or may not be related to the current task.</ide_selection>
+# CLAUDE.md — Pariksha Build Context
+
+This file is the master context for the Pariksha hackathon build. Read this fully before any code change.
+
+## What I'm building
+
+**Pariksha** — an on-chain proving ground and marketplace for jurisdiction-specific legal AI agents. Each agent is an iNFT (ERC-7857) on 0G Storage with verifiable benchmark scores, a human-readable ENS identity, and atomic hire-and-attest execution via KeeperHub.
+
+**Submission for:** ETHGlobal Open Agents hackathon (Apr 24 – May 3, 2026)
+**Prize tracks targeted:** 0G iNFT track ($7.5K), ENS AI Agent Integration ($2.5K), KeeperHub Best Use ($4.5K + $250 feedback bonus)
+**Build time available:** ~10 hours
+
+## Builder context
+
+I am Aritra Sarkhel. I am NOT a deeply technical engineer. I built NyayaMitra previously with help from Claude Code. NyayaMitra is a live legal AI product with 11 specialized agents (Vidhi, Kosh, Sahayak, Raksha, Prakriya, Suchana, Ganit, Bhasha, Setu, Vichar, Pipeline) running on FastAPI + PostgreSQL + Neo4j + Railway. Pariksha is a NEW project that wraps the existing NyayaMitra agents in an on-chain marketplace layer.
+
+**Critical:** Pariksha is in a SEPARATE folder from NyayaMitra. Pariksha calls NyayaMitra agents over HTTP via a proxy. We do not modify NyayaMitra source code. We do not paste NyayaMitra source code into the Pariksha repo.
+
+## Tech stack (locked — do not change)
+
+- **Frontend + Backend:** Next.js 14 (App Router) + TypeScript + Tailwind + shadcn/ui
+- **Wallet/chain:** wagmi + viem + RainbowKit
+- **Database:** Supabase (Postgres)
+- **Smart contracts:** Solidity + Foundry
+- **Storage (offchain):** 0G Storage SDK
+- **Deploy:** Vercel
+- **Chains:** Sepolia (ENS), Base Sepolia (USDC + KeeperHub), 0G Galileo testnet (iNFT)
+- **Agent backend:** Existing NyayaMitra FastAPI (Railway) accessed via proxy
+- **Judge AI:** Anthropic Claude Sonnet 4.5 (for Pariksha benchmark scoring)
+
+## Core principles when writing code
+
+1. **Vertical slices, not horizontal layers.** Get one agent fully end-to-end before adding more.
+2. **No new agent backends.** Pariksha is a wrapper. Agent logic = existing NyayaMitra endpoints.
+3. **Mock cleanly when needed.** If 0G testnet has issues, fall back to ERC-721 on Base Sepolia and document the fallback in code comments.
+4. **Keep it minimal.** Hackathon code, not production. Five tables in Supabase. Five frontend pages. Three smart contracts max.
+5. **Always commit and deploy after each prompt.** Working deployable thing at every checkpoint.
+6. **Cost discipline.** Total Claude Code budget: $20. If a single task costs more than $5, escalate and ask for guidance.
+
+## Design system (apply universally)
+
+```
+Background dark:     #0A0A0F
+Background panel:    #14141A
+Border subtle:       #2A2A35
+Text primary:        #F5F5F7
+Text muted:          #8B8B95
+
+Accent verified:     #00FF94    (electric mint — only for verified scores)
+Accent untested:     #FF3B5C    (signal red — for "untested" / warnings)
+Accent rare:         #D4AF37    (gold — premium badges only)
+
+Jurisdiction tags:
+  India:             #FF9500
+  Singapore:         #FF3B5C
+  UAE-DIFC:          #00C7FF
+  US:                #BF5AF2
+
+Fonts (Google Fonts):
+  Display:           Space Grotesk
+  Body:              Inter
+  Mono:              JetBrains Mono
+```
+
+**Layout rules:**
+- Min 80px padding between major sections
+- Cards: `bg-[#14141A]` with `border border-[#2A2A35]` and `rounded-2xl`
+- Numbers (scores, USDC, days): mono font, large, dominant
+- Hover state on cards: `translate-y-[-2px]` + accent border
+- One screaming accent per screen — usually the verified score
+
+## Schema (Supabase)
+
+```sql
+CREATE TABLE agents (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  ens_name TEXT UNIQUE NOT NULL,
+  display_name TEXT NOT NULL,
+  jurisdiction TEXT NOT NULL,
+  specialty TEXT NOT NULL,
+  inft_address TEXT,
+  inft_token_id TEXT,
+  owner_address TEXT,
+  backend_endpoint TEXT NOT NULL,
+  system_prompt TEXT,
+  price_usdc NUMERIC NOT NULL,
+  current_score NUMERIC,
+  total_hires INTEGER DEFAULT 0,
+  total_pariksha_runs INTEGER DEFAULT 0,
+  lifetime_usdc_earned NUMERIC DEFAULT 0,
+  training_examples_count INTEGER DEFAULT 0,
+  corpus_version TEXT DEFAULT 'v1',
+  status TEXT DEFAULT 'listed', -- 'listed' | 'demo_ready' | 'live'
+  minted_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+
+CREATE TABLE pariksha_runs (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  agent_ens TEXT NOT NULL REFERENCES agents(ens_name),
+  questions JSONB NOT NULL,
+  agent_answers JSONB NOT NULL,
+  golden_answers JSONB NOT NULL,
+  per_question_scores JSONB NOT NULL,
+  final_score NUMERIC NOT NULL,
+  judge_reasoning TEXT,
+  attestation_tx_hash TEXT,
+  run_at TIMESTAMPTZ DEFAULT now()
+);
+
+CREATE TABLE hires (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  agent_ens TEXT NOT NULL REFERENCES agents(ens_name),
+  buyer_address TEXT NOT NULL,
+  query TEXT NOT NULL,
+  response TEXT NOT NULL,
+  usdc_paid NUMERIC NOT NULL,
+  payment_tx_hash TEXT,
+  attestation_tx_hash TEXT,
+  hired_at TIMESTAMPTZ DEFAULT now()
+);
+
+CREATE TABLE training_data (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  agent_ens TEXT NOT NULL REFERENCES agents(ens_name),
+  query TEXT NOT NULL,
+  response TEXT NOT NULL,
+  feedback_score NUMERIC,
+  zerog_storage_pointer TEXT,
+  stored_at TIMESTAMPTZ DEFAULT now()
+);
+
+CREATE TABLE badges (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  agent_ens TEXT NOT NULL REFERENCES agents(ens_name),
+  badge_type TEXT NOT NULL, -- 'verified' | 'veteran' | 'excellence' | 'polyglot' | 'specialist'
+  badge_token_id TEXT,
+  threshold_data JSONB,
+  minted_at TIMESTAMPTZ DEFAULT now()
+);
+```
+
+## Demo agent seed data (initial 4 demo-ready agents, 7 listed)
+
+```typescript
+const DEMO_READY_AGENTS = [
+  {
+    ens_name: "delhi.in.pariksha.eth",
+    display_name: "Vidhi — Delhi HC",
+    jurisdiction: "India",
+    specialty: "Delhi High Court commercial litigation, Section 138 NI Act",
+    backend_endpoint: process.env.NYAYAMITRA_VIDHI_PROXY_URL,
+    system_prompt: "You are Vidhi, NyayaMitra's legal research agent. You specialize in Delhi High Court commercial litigation. Cite only verified Indian case law. If uncertain, say so explicitly. Apply the RAG Grounding Directive: never fabricate legislation, never conflate holdings, never paraphrase past the source.",
+    price_usdc: 0.05,
+    status: "demo_ready"
+  },
+  {
+    ens_name: "singapore.pariksha.eth",
+    display_name: "Vidhi — Singapore",
+    jurisdiction: "Singapore",
+    specialty: "SIAC international commercial arbitration",
+    backend_endpoint: process.env.NYAYAMITRA_VIDHI_PROXY_URL,
+    system_prompt: "You are Vidhi, specialized in Singapore International Arbitration Centre matters. Apply Singapore International Arbitration Act framework. Cite verified SIAC awards and Singapore High Court decisions only.",
+    price_usdc: 0.05,
+    status: "demo_ready"
+  },
+  {
+    ens_name: "difc.ae.pariksha.eth",
+    display_name: "Vidhi — UAE-DIFC",
+    jurisdiction: "UAE-DIFC",
+    specialty: "DIFC commercial contracts, English common law",
+    backend_endpoint: process.env.NYAYAMITRA_VIDHI_PROXY_URL,
+    system_prompt: "You are Vidhi, specialized in DIFC commercial law. Apply DIFC Contract Law and English common law principles. Cite verified DIFC Courts decisions.",
+    price_usdc: 0.05,
+    status: "demo_ready"
+  },
+  {
+    ens_name: "ny.us.pariksha.eth",
+    display_name: "Vidhi — US Commercial",
+    jurisdiction: "US",
+    specialty: "US commercial contracts, securities",
+    backend_endpoint: process.env.NYAYAMITRA_VIDHI_PROXY_URL,
+    system_prompt: "You are Vidhi, specialized in US commercial contract law and securities regulation. Cite verified US case law from federal and state appellate courts. Note jurisdictional variations.",
+    price_usdc: 0.05,
+    status: "demo_ready"
+  }
+];
+
+const LISTED_AGENTS = [
+  // Kosh, Sahayak, Raksha, Prakriya, Bhasha, Suchana — to be filled in via PROMPT-06
+];
+```
+
+## Environment variables required
+
+```
+# Supabase
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
+SUPABASE_SERVICE_KEY=
+
+# WalletConnect / RainbowKit
+NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID=
+
+# Anthropic (for judge agent)
+ANTHROPIC_API_KEY=
+
+# NyayaMitra proxy (your existing backend)
+NYAYAMITRA_VIDHI_PROXY_URL=
+NYAYAMITRA_KOSH_PROXY_URL=
+NYAYAMITRA_SAHAYAK_PROXY_URL=
+NYAYAMITRA_RAKSHA_PROXY_URL=
+NYAYAMITRA_PROXY_API_KEY=
+
+# Smart contracts (set after deploy)
+NEXT_PUBLIC_INFT_CONTRACT_ADDRESS=
+NEXT_PUBLIC_BADGE_CONTRACT_ADDRESS=
+NEXT_PUBLIC_ATTESTATION_CONTRACT_ADDRESS=
+
+# Chain configs
+NEXT_PUBLIC_SEPOLIA_RPC=https://sepolia.drpc.org
+NEXT_PUBLIC_BASE_SEPOLIA_RPC=https://sepolia.base.org
+NEXT_PUBLIC_ZEROG_GALILEO_RPC=
+NEXT_PUBLIC_USDC_BASE_SEPOLIA=0x036CbD53842c5426634e7929541eC2318f3dCF7e
+
+# KeeperHub
+KEEPERHUB_API_KEY=
+
+# Deploy private key (Foundry only — never frontend)
+DEPLOYER_PRIVATE_KEY=
+```
+
+## File structure
+
+```
+pariksha/
+├── CLAUDE.md                       (this file)
+├── .env.local                      (secrets — never commit)
+├── .gitignore
+├── package.json
+├── pnpm-lock.yaml
+├── next.config.js
+├── tailwind.config.ts
+├── tsconfig.json
+├── README.md
+├── FEEDBACK.md                     (KeeperHub bonus)
+│
+├── app/
+│   ├── layout.tsx
+│   ├── page.tsx                    (marketplace landing)
+│   ├── globals.css
+│   ├── providers.tsx               (wagmi, RainbowKit)
+│   ├── agent/[ens]/page.tsx       (agent profile)
+│   ├── pariksha/[ens]/page.tsx    (run benchmark)
+│   ├── hire/[ens]/page.tsx        (hire flow)
+│   └── api/
+│       ├── agents/route.ts
+│       ├── agents/[ens]/route.ts
+│       ├── pariksha/run/route.ts
+│       ├── hire/route.ts
+│       ├── proxy/[agent]/route.ts  (NyayaMitra proxy)
+│       └── suchana/run/route.ts    (daily research cron)
+│
+├── components/
+│   ├── ui/                         (shadcn/ui generated)
+│   ├── agent-card.tsx
+│   ├── score-display.tsx           (the count-up animation)
+│   ├── jurisdiction-tag.tsx
+│   ├── ens-pill.tsx
+│   └── nav.tsx
+│
+├── lib/
+│   ├── supabase.ts
+│   ├── ens.ts
+│   ├── contracts/
+│   │   ├── inft.ts
+│   │   ├── badge.ts
+│   │   └── abis.ts
+│   ├── pariksha-engine.ts          (judge logic)
+│   ├── proxy.ts                    (NyayaMitra calls)
+│   ├── keeperhub.ts
+│   └── utils.ts
+│
+├── contracts/
+│   ├── PariksaINFT.sol
+│   ├── PariksaBadge.sol
+│   └── ParikshaAttestation.sol
+│
+├── foundry.toml
+├── script/
+│   └── Deploy.s.sol
+│
+├── data/
+│   ├── benchmark-questions.json    (90 Q&A pairs)
+│   └── seed-agents.json
+│
+└── public/
+    ├── pariksha-logo.svg
+    └── favicon.ico
+```
+
+## Acceptance criteria for "done"
+
+The hackathon submission is done when:
+- [ ] `pnpm dev` runs without errors
+- [ ] Marketplace page renders 11 agents (4 demo-ready, 7 listed)
+- [ ] Click into an agent → profile page renders with iNFT data + score history
+- [ ] Click "Run Pariksha" → benchmark runs, score lands on-chain (or in DB if 0G fallback), updates ENS text record
+- [ ] Click "Hire" → wallet prompts for USDC payment → KeeperHub call → query response → attestation
+- [ ] Raksha demo flow works (5 personas + judge)
+- [ ] Vercel deployment is live at production URL
+- [ ] Demo video uploaded
+- [ ] GitHub repo is public, README is complete, FEEDBACK.md exists
+- [ ] ETHGlobal submission is filed with 3 partner prizes selected
+
+## When in doubt
+
+- Pick the simpler option
+- Mock and document, don't block
+- Ship slice 1+2 (one agent end-to-end) over slice 5 (everything but broken)
+- Ask before adding any feature not in this doc

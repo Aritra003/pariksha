@@ -1,0 +1,384 @@
+<ide_selection>The user selected the lines 1 to 191 from /Users/aritrasarkhel/Desktop/ETH Items/files/PROMPT-01-foundation.md:
+# PROMPT 01 — Foundation
+
+Paste this into Claude Code AFTER you've already pasted CLAUDE.md as your first message.
+
+---
+
+## Task: Initialize the Pariksha project foundation
+
+Read CLAUDE.md fully before writing any code. Then execute the following in order. After each major step, commit with a clear message.
+
+### Step 1: Initialize Next.js 14 project
+
+In the current directory (`~/code/pariksha`), initialize a new Next.js 14 project with TypeScript, Tailwind, App Router, and the `src/` directory disabled (we use top-level `app/`).
+
+Use this exact command:
+```bash
+pnpm create next-app@14 . --typescript --tailwind --app --no-src-dir --import-alias "@/*" --use-pnpm
+```
+
+If it asks about ESLint, say yes.
+
+### Step 2: Install all dependencies
+
+```bash
+pnpm add wagmi viem @rainbow-me/rainbowkit @tanstack/react-query
+pnpm add @supabase/supabase-js
+pnpm add @anthropic-ai/sdk
+pnpm add framer-motion lucide-react
+pnpm add ethers@^6 axios
+pnpm add -D @types/node tsx
+```
+
+### Step 3: Initialize shadcn/ui
+
+```bash
+pnpm dlx shadcn@latest init -d
+```
+When prompted:
+- Style: Default
+- Base color: Neutral
+- CSS variables: yes
+
+Then install these components:
+```bash
+pnpm dlx shadcn@latest add button card dialog input label badge separator avatar progress tabs toast tooltip
+```
+
+### Step 4: Configure the design system
+
+Replace `app/globals.css` with the Pariksha design system. Use the colors from CLAUDE.md as CSS variables. The theme is dark-only — no light mode.
+
+Add Google Fonts in `app/layout.tsx`:
+```typescript
+import { Space_Grotesk, Inter, JetBrains_Mono } from 'next/font/google'
+
+const spaceGrotesk = Space_Grotesk({ subsets: ['latin'], variable: '--font-display' })
+const inter = Inter({ subsets: ['latin'], variable: '--font-body' })
+const jetbrainsMono = JetBrains_Mono({ subsets: ['latin'], variable: '--font-mono' })
+```
+
+Update `tailwind.config.ts` to:
+- Use the Pariksha colors as design tokens (`background`, `panel`, `border-subtle`, `text-primary`, `text-muted`, `accent-verified`, `accent-untested`, `accent-rare`, `jurisdiction-india`, `jurisdiction-singapore`, `jurisdiction-difc`, `jurisdiction-us`)
+- Map fonts: `font-display`, `font-body`, `font-mono`
+- Set dark mode as default (force class on `<html>`)
+
+Update `app/layout.tsx` to apply `bg-background text-text-primary font-body` on body, and add `<html lang="en" className="dark">`.
+
+### Step 5: Set up Supabase
+
+Create `lib/supabase.ts`:
+```typescript
+import { createClient } from '@supabase/supabase-js'
+
+export const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+)
+
+export const supabaseAdmin = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_KEY!
+)
+```
+
+Create the database migration in a file called `supabase/migrations/001_initial_schema.sql`. Use the schema from CLAUDE.md verbatim.
+
+Print the SQL out for me to copy-paste into Supabase Studio (`Settings → Database → SQL Editor`). I'll run it manually.
+
+### Step 6: Set up wallet/wagmi providers
+
+Create `app/providers.tsx`:
+```typescript
+'use client'
+
+import { RainbowKitProvider, getDefaultConfig, darkTheme } from '@rainbow-me/rainbowkit'
+import { WagmiProvider } from 'wagmi'
+import { sepolia, baseSepolia } from 'wagmi/chains'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import '@rainbow-me/rainbowkit/styles.css'
+
+const config = getDefaultConfig({
+  appName: 'Pariksha',
+  projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID!,
+  chains: [sepolia, baseSepolia],
+  ssr: true,
+})
+
+const queryClient = new QueryClient()
+
+export function Providers({ children }: { children: React.ReactNode }) {
+  return (
+    <WagmiProvider config={config}>
+      <QueryClientProvider client={queryClient}>
+        <RainbowKitProvider theme={darkTheme({
+          accentColor: '#00FF94',
+          accentColorForeground: '#0A0A0F',
+          borderRadius: 'medium',
+        })}>
+          {children}
+        </RainbowKitProvider>
+      </QueryClientProvider>
+    </WagmiProvider>
+  )
+}
+```
+
+Wrap `<Providers>` around `{children}` in `app/layout.tsx`.
+
+### Step 7: Build the marketplace landing page (skeleton)
+
+Replace `app/page.tsx` with a Pariksha marketplace landing. Make it look striking even with placeholder data:
+
+- **Hero section** (full viewport height, centered):
+  - Large display text: "PARIKSHA"
+  - Subtext: "The proving ground for legal AI agents"
+  - Two ENS-styled badges underneath: `pariksha.eth` and the four jurisdiction subdomain pills
+  - Connect Wallet button (RainbowKit)
+  - Subtle scroll indicator at bottom
+
+- **Stats strip** (immediately below hero, sticky-ish):
+  - "11 Agents" / "4 Jurisdictions" / "0 Total Pariksha Runs" / "0.00 USDC Lifetime Value"
+  - All numbers in mono font, large, electric mint color when value > 0
+
+- **Agent grid** (below stats):
+  - 4-column on desktop, 2-column on tablet, 1-column on mobile
+  - Each card: jurisdiction tag pill, ENS name in mono, display name, specialty, Pariksha score (or "untested" in red), price in USDC mono
+  - Hover: card translates up 2px, border becomes accent verified
+  - For now, render placeholder data — we'll wire to Supabase in next prompt
+
+Use Framer Motion for the entry animation: cards fade in with staggered 50ms delay.
+
+### Step 8: Create the env file template
+
+Create `.env.local.example` with all the variables from CLAUDE.md (with empty values). Add `.env*` to `.gitignore`.
+
+### Step 9: Commit and verify
+
+After everything compiles cleanly:
+```bash
+git init
+git add .
+git commit -m "Pariksha foundation: Next.js + Tailwind + wallet + design system"
+```
+
+Then run `pnpm dev` and verify:
+- Page loads at localhost:3000 without errors
+- Connect Wallet button works (opens RainbowKit modal)
+- Layout looks like a serious legal-AI marketplace, not a generic crypto site
+- All four jurisdiction tag colors render correctly
+- Hero text uses Space Grotesk
+
+### Step 10: Acceptance check
+
+Print to me:
+1. The contents of `package.json`
+2. The SQL schema (so I can paste into Supabase)
+3. The list of TODOs for next prompt
+4. Any blockers or warnings
+
+Stop after this. Do not proceed to smart contracts. I'll review and start the next prompt manually.
+
+---
+
+## Important constraints
+
+- Do NOT add any agent backend logic. We proxy to NyayaMitra in PROMPT-03.
+- Do NOT deploy contracts yet.
+- Do NOT add any feature not in this prompt.
+- If anything is ambiguous, pick the simpler option and add a `TODO:` comment.
+- Use TypeScript strict mode. Fix all type errors before committing.
+
+
+This may or may not be related to the current task.</ide_selection>
+# PROMPT 01 — Foundation
+
+Paste this into Claude Code AFTER you've already pasted CLAUDE.md as your first message.
+
+---
+
+## Task: Initialize the Pariksha project foundation
+
+Read CLAUDE.md fully before writing any code. Then execute the following in order. After each major step, commit with a clear message.
+
+### Step 1: Initialize Next.js 14 project
+
+In the current directory (`~/code/pariksha`), initialize a new Next.js 14 project with TypeScript, Tailwind, App Router, and the `src/` directory disabled (we use top-level `app/`).
+
+Use this exact command:
+```bash
+pnpm create next-app@14 . --typescript --tailwind --app --no-src-dir --import-alias "@/*" --use-pnpm
+```
+
+If it asks about ESLint, say yes.
+
+### Step 2: Install all dependencies
+
+```bash
+pnpm add wagmi viem @rainbow-me/rainbowkit @tanstack/react-query
+pnpm add @supabase/supabase-js
+pnpm add @anthropic-ai/sdk
+pnpm add framer-motion lucide-react
+pnpm add ethers@^6 axios
+pnpm add -D @types/node tsx
+```
+
+### Step 3: Initialize shadcn/ui
+
+```bash
+pnpm dlx shadcn@latest init -d
+```
+When prompted:
+- Style: Default
+- Base color: Neutral
+- CSS variables: yes
+
+Then install these components:
+```bash
+pnpm dlx shadcn@latest add button card dialog input label badge separator avatar progress tabs toast tooltip
+```
+
+### Step 4: Configure the design system
+
+Replace `app/globals.css` with the Pariksha design system. Use the colors from CLAUDE.md as CSS variables. The theme is dark-only — no light mode.
+
+Add Google Fonts in `app/layout.tsx`:
+```typescript
+import { Space_Grotesk, Inter, JetBrains_Mono } from 'next/font/google'
+
+const spaceGrotesk = Space_Grotesk({ subsets: ['latin'], variable: '--font-display' })
+const inter = Inter({ subsets: ['latin'], variable: '--font-body' })
+const jetbrainsMono = JetBrains_Mono({ subsets: ['latin'], variable: '--font-mono' })
+```
+
+Update `tailwind.config.ts` to:
+- Use the Pariksha colors as design tokens (`background`, `panel`, `border-subtle`, `text-primary`, `text-muted`, `accent-verified`, `accent-untested`, `accent-rare`, `jurisdiction-india`, `jurisdiction-singapore`, `jurisdiction-difc`, `jurisdiction-us`)
+- Map fonts: `font-display`, `font-body`, `font-mono`
+- Set dark mode as default (force class on `<html>`)
+
+Update `app/layout.tsx` to apply `bg-background text-text-primary font-body` on body, and add `<html lang="en" className="dark">`.
+
+### Step 5: Set up Supabase
+
+Create `lib/supabase.ts`:
+```typescript
+import { createClient } from '@supabase/supabase-js'
+
+export const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+)
+
+export const supabaseAdmin = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_KEY!
+)
+```
+
+Create the database migration in a file called `supabase/migrations/001_initial_schema.sql`. Use the schema from CLAUDE.md verbatim.
+
+Print the SQL out for me to copy-paste into Supabase Studio (`Settings → Database → SQL Editor`). I'll run it manually.
+
+### Step 6: Set up wallet/wagmi providers
+
+Create `app/providers.tsx`:
+```typescript
+'use client'
+
+import { RainbowKitProvider, getDefaultConfig, darkTheme } from '@rainbow-me/rainbowkit'
+import { WagmiProvider } from 'wagmi'
+import { sepolia, baseSepolia } from 'wagmi/chains'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import '@rainbow-me/rainbowkit/styles.css'
+
+const config = getDefaultConfig({
+  appName: 'Pariksha',
+  projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID!,
+  chains: [sepolia, baseSepolia],
+  ssr: true,
+})
+
+const queryClient = new QueryClient()
+
+export function Providers({ children }: { children: React.ReactNode }) {
+  return (
+    <WagmiProvider config={config}>
+      <QueryClientProvider client={queryClient}>
+        <RainbowKitProvider theme={darkTheme({
+          accentColor: '#00FF94',
+          accentColorForeground: '#0A0A0F',
+          borderRadius: 'medium',
+        })}>
+          {children}
+        </RainbowKitProvider>
+      </QueryClientProvider>
+    </WagmiProvider>
+  )
+}
+```
+
+Wrap `<Providers>` around `{children}` in `app/layout.tsx`.
+
+### Step 7: Build the marketplace landing page (skeleton)
+
+Replace `app/page.tsx` with a Pariksha marketplace landing. Make it look striking even with placeholder data:
+
+- **Hero section** (full viewport height, centered):
+  - Large display text: "PARIKSHA"
+  - Subtext: "The proving ground for legal AI agents"
+  - Two ENS-styled badges underneath: `pariksha.eth` and the four jurisdiction subdomain pills
+  - Connect Wallet button (RainbowKit)
+  - Subtle scroll indicator at bottom
+
+- **Stats strip** (immediately below hero, sticky-ish):
+  - "11 Agents" / "4 Jurisdictions" / "0 Total Pariksha Runs" / "0.00 USDC Lifetime Value"
+  - All numbers in mono font, large, electric mint color when value > 0
+
+- **Agent grid** (below stats):
+  - 4-column on desktop, 2-column on tablet, 1-column on mobile
+  - Each card: jurisdiction tag pill, ENS name in mono, display name, specialty, Pariksha score (or "untested" in red), price in USDC mono
+  - Hover: card translates up 2px, border becomes accent verified
+  - For now, render placeholder data — we'll wire to Supabase in next prompt
+
+Use Framer Motion for the entry animation: cards fade in with staggered 50ms delay.
+
+### Step 8: Create the env file template
+
+Create `.env.local.example` with all the variables from CLAUDE.md (with empty values). Add `.env*` to `.gitignore`.
+
+### Step 9: Commit and verify
+
+After everything compiles cleanly:
+```bash
+git init
+git add .
+git commit -m "Pariksha foundation: Next.js + Tailwind + wallet + design system"
+```
+
+Then run `pnpm dev` and verify:
+- Page loads at localhost:3000 without errors
+- Connect Wallet button works (opens RainbowKit modal)
+- Layout looks like a serious legal-AI marketplace, not a generic crypto site
+- All four jurisdiction tag colors render correctly
+- Hero text uses Space Grotesk
+
+### Step 10: Acceptance check
+
+Print to me:
+1. The contents of `package.json`
+2. The SQL schema (so I can paste into Supabase)
+3. The list of TODOs for next prompt
+4. Any blockers or warnings
+
+Stop after this. Do not proceed to smart contracts. I'll review and start the next prompt manually.
+
+---
+
+## Important constraints
+
+- Do NOT add any agent backend logic. We proxy to NyayaMitra in PROMPT-03.
+- Do NOT deploy contracts yet.
+- Do NOT add any feature not in this prompt.
+- If anything is ambiguous, pick the simpler option and add a `TODO:` comment.
+- Use TypeScript strict mode. Fix all type errors before committing.
