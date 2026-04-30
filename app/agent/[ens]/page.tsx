@@ -43,7 +43,7 @@ interface Run {
 interface Badge {
   id: string
   badge_type: string
-  awarded_at: string
+  minted_at: string | null
   tx_hash: string | null
 }
 
@@ -265,7 +265,7 @@ export default function AgentProfilePage() {
                   >
                     <span className="font-mono text-xs font-semibold text-accent-rare">{b.badge_type}</span>
                     <span className="font-mono text-[10px] text-text-muted">
-                      {new Date(b.awarded_at).toLocaleDateString()}
+                      {b.minted_at ? new Date(b.minted_at).toLocaleDateString() : '—'}
                     </span>
                   </div>
                 ))}

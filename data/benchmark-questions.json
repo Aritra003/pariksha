@@ -1,131 +1,190 @@
 {
-  "_note": "TODO: Replace placeholder questions with verified Q&A pairs before demo recording. These are structural placeholders only.",
   "delhi.in.pariksha.eth": [
     {
-      "id": "delhi-001",
-      "question": "Under Section 138 of the Negotiable Instruments Act, what is the limitation period for filing a complaint after the cause of action arises?",
-      "goldenAnswer": "Under Section 142(b) of the NI Act, the complaint must be filed within one month of the date on which the cause of action arises under Section 138(c) — i.e., within one month of the failure to make payment within 15 days of receipt of the demand notice.",
-      "category": "limitation"
+      "id": "india-001",
+      "question": "Under Section 138 of the Negotiable Instruments Act, what is the limitation period for filing a complaint, and how did the Delhi High Court clarify the cause-of-action accrual in 2023?",
+      "goldenAnswer": "Under Section 142(b) of the NI Act, a complaint must be filed within one month of the cause of action under Section 138(c) — the date on which the 15-day payment window after demand notice expires. Delhi HC in Umesh Bhargava v. Vijay Shankar Pathak (2023) reaffirmed that each returned cheque gives rise to an independent cause of action and that filing delay beyond one month is fatal absent condonation under the proviso to Section 142(b).",
+      "category": "limitation",
+      "jurisdiction": "India",
+      "expected_topics": ["Section 138", "NI Act", "limitation", "demand notice", "cause of action"],
+      "difficulty": "medium"
     },
     {
-      "id": "delhi-002",
-      "question": "In a commercial suit before the Delhi High Court, what is the pecuniary jurisdiction threshold under the Commercial Courts Act 2015?",
-      "goldenAnswer": "Under the Commercial Courts Act 2015 as amended, the specified value for commercial disputes in High Courts having original jurisdiction (including Delhi HC) is above Rs. 3 lakh (three lakh rupees) with effect from the 2018 amendment. The original threshold was Rs. 1 crore.",
-      "category": "jurisdiction"
+      "id": "india-002",
+      "question": "What are the practical implications of the Specific Relief (Amendment) Act 2018 for parties seeking specific performance of construction contracts in India?",
+      "goldenAnswer": "The Specific Relief (Amendment) Act 2018 amended Section 10 to make specific performance the rule (not discretionary) for breach of contract, removing the court's discretion except in limited circumstances. For construction contracts, the amendment enables courts to engage qualified experts and technical supervisors to oversee contract performance. The proviso preserves discretion where specific performance would involve performance of a continuous duty requiring constant supervision, as in complex infrastructure contracts.",
+      "category": "contract",
+      "jurisdiction": "India",
+      "expected_topics": ["Specific Relief Act", "Section 10", "2018 amendment", "construction contracts", "specific performance"],
+      "difficulty": "hard"
     },
     {
-      "id": "delhi-003",
-      "question": "What is the Supreme Court's position on the doctrine of forum non conveniens in transnational commercial disputes involving Indian parties?",
-      "goldenAnswer": "The Supreme Court in Modi Entertainment Network v. W.S.G. Cricket Pte Ltd (2003) 4 SCC 341 held that Indian courts have jurisdiction where the cause of action arises in India but may decline jurisdiction on forum non conveniens principles. The court must balance natural forum factors against legitimate juridical advantages to the plaintiff.",
-      "category": "doctrine"
+      "id": "india-003",
+      "question": "Under the Insolvency and Bankruptcy Code 2016, what is the minimum threshold for filing a Section 9 operational creditor petition, and what procedural preconditions must be satisfied?",
+      "goldenAnswer": "Under Section 9 of the IBC, an operational creditor may initiate CIRP if the operational debt exceeds Rs. 1 crore (raised from Rs. 1 lakh by the 2020 amendment). Preconditions: (1) a demand notice must be delivered under Section 8; (2) the corporate debtor must fail to repay the debt or dispute it within 10 days; (3) the creditor must confirm no notice of dispute has been received. The NCLT applies CoC of India Ltd v. Amit Metaliks (2021) to assess pre-existing disputes.",
+      "category": "insolvency",
+      "jurisdiction": "India",
+      "expected_topics": ["IBC", "Section 9", "operational creditor", "Rs. 1 crore threshold", "demand notice"],
+      "difficulty": "medium"
     },
     {
-      "id": "delhi-004",
-      "question": "Under the Arbitration and Conciliation Act 1996, can an Indian court grant interim relief under Section 9 after an arbitral tribunal has been constituted?",
-      "goldenAnswer": "Yes. Under Section 9(3) of the A&C Act (as amended in 2015), once an arbitral tribunal is constituted, the court shall not entertain an application under Section 9 unless the court finds that circumstances exist which may not render the remedy provided under Section 17 efficacious.",
-      "category": "arbitration"
+      "id": "india-004",
+      "question": "The Finance Act 2023 abolished angel tax under Section 56(2)(viib) of the Income Tax Act for foreign investors. What is the current legal position and its impact on startup funding rounds?",
+      "goldenAnswer": "The Finance Act 2023 exempted foreign investors from the Section 56(2)(viib) angel tax provisions. The Finance Act 2024 further abolished Section 56(2)(viib) entirely (effective April 1, 2025), removing the deemed income tax on excess consideration over fair market value for all investors. Startups recognised by DPIIT were already exempt. The abolition removes a major friction from Series A/B funding rounds in India and eliminates tax litigation risk on preference share premiums.",
+      "category": "taxation",
+      "jurisdiction": "India",
+      "expected_topics": ["Section 56(2)(viib)", "angel tax", "Finance Act 2024", "startup", "DPIIT"],
+      "difficulty": "hard"
     },
     {
-      "id": "delhi-005",
-      "question": "What constitutes 'just and equitable' grounds for winding up of a company under Section 271(e) of the Companies Act 2013?",
-      "goldenAnswer": "Section 271(e) of the Companies Act 2013 allows winding up if the tribunal is of the opinion that it is just and equitable to wind up the company. Courts apply this where: (i) substratum of the company has gone; (ii) there is deadlock in management; (iii) the company is a quasi-partnership and mutual trust has broken down; or (iv) the company was formed for a fraudulent or illegal purpose.",
-      "category": "corporate"
+      "id": "india-005",
+      "question": "Under Section 28 of the Indian Contract Act, what is the enforceability of contractual clauses that restrict parties from initiating legal proceedings beyond a specified time?",
+      "goldenAnswer": "Section 28 of the Indian Contract Act makes void any agreement that absolutely restricts a party from enforcing their rights in court. However, Exception 1 permits agreements to enforce rights only in a specified court. Exception 2 permits arbitration clauses. The Supreme Court in BSNL v. Subash Chandra Kanchan (2006) held that agreed time limits shorter than the statutory limitation period are void as restraints on legal proceedings, unless falling within the exceptions.",
+      "category": "contract",
+      "jurisdiction": "India",
+      "expected_topics": ["Section 28", "restraint of legal proceedings", "Contract Act", "limitation", "void agreement"],
+      "difficulty": "medium"
     }
   ],
-  "singapore.pariksha.eth": [
+  "vidhi.sg.pariksha.eth": [
     {
       "id": "sg-001",
-      "question": "Under the SIAC Arbitration Rules 2016, what is the default timeline for constituting an emergency arbitral tribunal after an application is filed?",
-      "goldenAnswer": "Under Rule 30.3 of the SIAC Rules 2016, the President of the Court of Arbitration shall seek to appoint an Emergency Arbitrator within one (1) business day of receipt by the Registrar of the Emergency Arbitrator application and the application fee.",
-      "category": "procedure"
+      "question": "Under the SIAC Arbitration Rules 2016, what is the default timeline for appointing an emergency arbitrator after an application is filed, and what orders can the emergency arbitrator make?",
+      "goldenAnswer": "Under Rule 30.3 of the SIAC Rules 2016, the President of the Court shall seek to appoint an Emergency Arbitrator within one business day of receipt of the application and the application fee. The Emergency Arbitrator may order or award any interim relief that a full tribunal could order. The emergency arbitrator's order or award is binding but may be modified by the subsequent tribunal under Rule 30.8.",
+      "category": "procedure",
+      "jurisdiction": "Singapore",
+      "expected_topics": ["SIAC Rules 2016", "Rule 30.3", "emergency arbitrator", "interim relief", "one business day"],
+      "difficulty": "medium"
     },
     {
       "id": "sg-002",
       "question": "In Singapore, what is the test for setting aside an arbitral award on grounds of breach of natural justice under Section 24(b) of the International Arbitration Act?",
-      "goldenAnswer": "Per Soh Beng Teck & Co Pte Ltd v Fairmount Development Pte Ltd [2007] 3 SLR(R) 86, the test requires: (1) which rule of natural justice was breached; (2) how it was breached; (3) in what way the breach was connected to the making of the award; and (4) how the breach prejudiced the rights of the applicant. The prejudice must be actual, not theoretical.",
-      "category": "arbitration"
+      "goldenAnswer": "Per Soh Beng Teck & Co v. Fairmount Development [2007] 3 SLR(R) 86, the test requires: (1) which rule of natural justice was breached; (2) how it was breached; (3) in what way the breach was connected to the making of the award; and (4) how the breach actually prejudiced the applicant's rights. The prejudice must be actual and not merely theoretical — courts apply a causative link test.",
+      "category": "arbitration",
+      "jurisdiction": "Singapore",
+      "expected_topics": ["Section 24(b)", "International Arbitration Act", "natural justice", "Soh Beng Teck", "prejudice"],
+      "difficulty": "hard"
     },
     {
       "id": "sg-003",
-      "question": "Under Singapore law, what is the Spiliada test for determining the appropriate forum in a conflict-of-laws dispute?",
-      "goldenAnswer": "The Spiliada test (adopted in Singapore in Rickshaw Investments v Nicolai Baron von Uexkull [2007] 1 SLR(R) 377) involves two stages: Stage 1 — whether there is another forum that is clearly or distinctly more appropriate than Singapore (natural forum); Stage 2 — even if there is, whether justice requires that Singapore courts should still exercise jurisdiction. Factors include connection of parties and facts to forum, governing law, and juridical advantages.",
-      "category": "conflict-of-laws"
+      "question": "What is the jurisdictional basis for the Singapore International Commercial Court (SICC) to hear foreign international commercial disputes, and what opt-in mechanism applies?",
+      "goldenAnswer": "The SICC has jurisdiction over international commercial claims under Order 110 of the Rules of Court and the Supreme Court of Judicature Act. Foreign parties can submit to SICC jurisdiction by a written jurisdiction agreement conferring jurisdiction on SICC. A case can also be transferred from the Singapore High Court under O. 110 r. 12. Foreign law need not be proven as fact in SICC proceedings — it is submitted as written submissions. The SICC may apply foreign law directly.",
+      "category": "jurisdiction",
+      "jurisdiction": "Singapore",
+      "expected_topics": ["SICC", "Order 110", "opt-in clause", "international commercial", "foreign parties"],
+      "difficulty": "hard"
     },
     {
       "id": "sg-004",
-      "question": "What are the requirements for a valid exclusion clause to exclude liability for negligence under Singapore contract law?",
-      "goldenAnswer": "Under Singapore law applying Photo Production Ltd v Securicor Transport [1980] AC 827 and the Unfair Contract Terms Act (Cap 396), an exclusion clause must: (1) be incorporated into the contract (by signature, notice, or course of dealing); (2) on true construction, cover the breach that occurred; and (3) satisfy the reasonableness test under UCTA for B2C or certain B2B contracts. Courts construe exclusion clauses contra proferentem.",
-      "category": "contract"
+      "question": "What are the requirements for a valid exclusion clause to exclude liability for negligence under Singapore contract law and the Unfair Contract Terms Act?",
+      "goldenAnswer": "Under Singapore law applying Photo Production Ltd v. Securicor [1980] AC 827 and the Unfair Contract Terms Act (Cap 396), an exclusion clause must: (1) be incorporated into the contract by signature, notice, or course of dealing; (2) on true construction, cover the breach that occurred; and (3) satisfy the UCTA reasonableness test for B2C or certain B2B contracts. Courts construe exclusion clauses contra proferentem against the party relying on them.",
+      "category": "contract",
+      "jurisdiction": "Singapore",
+      "expected_topics": ["exclusion clause", "UCTA", "Photo Production", "reasonableness test", "contra proferentem"],
+      "difficulty": "medium"
     },
     {
       "id": "sg-005",
-      "question": "Under the Singapore Companies Act, what is the threshold for a minority shareholder to bring a statutory derivative action?",
-      "goldenAnswer": "Under Section 216A of the Singapore Companies Act (Cap 50), a complainant who is a member holding not less than 5% of the issued shares, or a director of the company, may apply to the court for leave to bring a derivative action. The court must be satisfied that: (i) the complainant has given 14 days' notice to the directors; (ii) the complainant is acting in good faith; and (iii) it appears prima facie to be in the interests of the company.",
-      "category": "corporate"
+      "question": "Under the Singapore Companies Act, what procedural requirements must be met before a minority shareholder can bring a statutory derivative action under Section 216A?",
+      "goldenAnswer": "Under Section 216A of the Singapore Companies Act, a complainant who is a member, director, or CEO may apply for leave to bring a derivative action. Requirements: (1) 14 days' written notice to the directors of the intention to apply; (2) the applicant is acting in good faith; (3) it appears prima facie in the interests of the company. Per Ang Thiam Swee v. Low Hian Chor [2013] 2 SLR 340, the court evaluates good faith by examining the complainant's honest belief and absence of collateral purpose.",
+      "category": "corporate",
+      "jurisdiction": "Singapore",
+      "expected_topics": ["Section 216A", "derivative action", "Companies Act", "14 days notice", "good faith"],
+      "difficulty": "medium"
     }
   ],
-  "difc.ae.pariksha.eth": [
+  "vidhi.ae.pariksha.eth": [
     {
       "id": "difc-001",
-      "question": "Under the DIFC Contract Law (DIFC Law No. 6 of 2004), what is the standard for determining whether a party has accepted an offer by conduct?",
-      "goldenAnswer": "Under Article 15 of the DIFC Contract Law, acceptance may be signified by conduct if it is reasonable for the offeror to interpret the conduct as acceptance. The acceptance must be communicated to the offeror, except where the offer indicates that performance without notification constitutes acceptance.",
-      "category": "contract-formation"
+      "question": "Under the DIFC Contract Law, how does the court distinguish between frustration and force majeure, and what remedies apply to each?",
+      "goldenAnswer": "Under DIFC Contract Law (DIFC Law No. 6 of 2004), frustration under Article 82 operates automatically and discharges obligations from the frustrating event, with prior obligations surviving. Force majeure under Article 83 requires contractual provision and typically suspends (not discharges) obligations. Frustration requires impossibility or fundamentally changed circumstances; force majeure requires contractual invocation and notice. Upon frustration, restitution of benefits conferred is available; force majeure remedies are contractually defined.",
+      "category": "contract",
+      "jurisdiction": "UAE-DIFC",
+      "expected_topics": ["frustration", "force majeure", "DIFC Contract Law", "Article 82", "discharge"],
+      "difficulty": "hard"
     },
     {
       "id": "difc-002",
-      "question": "In DIFC Courts, what is the procedure for recognising and enforcing a foreign arbitral award under the New York Convention?",
-      "goldenAnswer": "The UAE ratified the New York Convention in 2006. In the DIFC Courts, foreign arbitral awards may be recognized and enforced by filing a claim under Part 43 of the DIFC Courts Rules of Procedure. The court applies the Convention's Article V grounds for refusal. The DIFC is also a conduit jurisdiction — awards recognised in DIFC can be enforced across the UAE via the Judicial Tribune Agreement between DIFC Courts and Dubai Courts.",
-      "category": "enforcement"
+      "question": "In DIFC Courts, how can non-DIFC parties establish jurisdiction for commercial disputes, and what is the conduit jurisdiction mechanism for UAE-wide enforcement?",
+      "goldenAnswer": "Non-DIFC parties can submit to DIFC Court jurisdiction via: (1) express jurisdiction clauses in their contracts; (2) accepting service of a claim form issued in the DIFC. The conduit jurisdiction mechanism — recognised in Fujairah National Group FZC v. Meydan Group LLC (DIFC CA, 2015) — allows a foreign award or judgment recognised in DIFC to be enforced across the UAE via the Judicial Authority Agreement between DIFC Courts and Dubai Courts, bypassing the Article V NYC grounds review at the execution stage.",
+      "category": "jurisdiction",
+      "jurisdiction": "UAE-DIFC",
+      "expected_topics": ["DIFC Courts", "conduit jurisdiction", "opt-in", "Judicial Authority Agreement", "non-DIFC parties"],
+      "difficulty": "hard"
     },
     {
       "id": "difc-003",
-      "question": "What are the grounds for setting aside a DIFC-LCIA arbitral award under the DIFC Arbitration Law?",
-      "goldenAnswer": "Under Article 41 of the DIFC Arbitration Law (DIFC Law No. 1 of 2008), an award may be set aside if: (i) a party to the arbitration agreement was under some incapacity; (ii) the arbitration agreement is invalid; (iii) a party was not given proper notice or was otherwise unable to present its case; (iv) the award deals with matters beyond the scope of submission; (v) the composition of the tribunal was not in accordance with the agreement; or (vi) the award is in conflict with public policy of the DIFC.",
-      "category": "arbitration"
+      "question": "What are the grounds for setting aside an arbitral award under Article 41 of the DIFC Arbitration Law (DIFC Law No. 1 of 2008)?",
+      "goldenAnswer": "Under Article 41, an award may be set aside if the applicant proves: (i) incapacity of a party; (ii) invalidity of the arbitration agreement; (iii) lack of proper notice or inability to present the case; (iv) the award deals with matters beyond the submission to arbitration; (v) the arbitral tribunal or procedure was not in accordance with the agreement; or (vi) the award is in conflict with DIFC public policy. The latter ground is narrowly construed and applied only for fundamental violations of moral or legal order.",
+      "category": "arbitration",
+      "jurisdiction": "UAE-DIFC",
+      "expected_topics": ["Article 41", "DIFC Arbitration Law", "setting aside", "public policy", "grounds"],
+      "difficulty": "medium"
     },
     {
       "id": "difc-004",
-      "question": "Under DIFC employment law, what is the minimum notice period for terminating an unlimited-term employment contract?",
-      "goldenAnswer": "Under Article 62 of the DIFC Employment Law (DIFC Law No. 2 of 2019), where an employer terminates an unlimited-term contract, the minimum notice period is: 30 days where employment has been less than 5 years; 60 days where employment has been 5 years or more. Parties may contract for longer notice periods. Payment in lieu of notice is permissible.",
-      "category": "employment"
+      "question": "Under the DIFC Employment Law 2019, how is end of service gratuity calculated for an employee who is terminated after 6 years of continuous service on a salary of AED 20,000/month?",
+      "goldenAnswer": "Under the DIFC Employment Law 2019 (as amended), gratuity is calculated at 21 calendar days' basic wage per year for the first 5 years, and 30 calendar days' basic wage per year for each subsequent year. For 6 years on AED 20,000 basic wage: Years 1-5 = (21/30) × 20,000 × 5 = AED 70,000. Year 6 = (30/30) × 20,000 × 1 = AED 20,000. Total = AED 90,000. Article 62 also permits parties to substitute an equivalent scheme (like a pension) with employee consent.",
+      "category": "employment",
+      "jurisdiction": "UAE-DIFC",
+      "expected_topics": ["Employment Law 2019", "gratuity", "end of service", "21 days", "Article 62"],
+      "difficulty": "medium"
     },
     {
       "id": "difc-005",
-      "question": "What are the disclosure obligations of a company director under the DIFC Companies Law in respect of conflicts of interest?",
-      "goldenAnswer": "Under Article 58 of the DIFC Companies Law (DIFC Law No. 5 of 2018), a director who has a direct or indirect material interest in a transaction or arrangement with the company must declare the nature and extent of that interest to the board. The declaration must be made before the company enters into the transaction. A director who fails to declare forfeits any profit made and may be held liable for breach of fiduciary duty.",
-      "category": "corporate-governance"
+      "question": "What are the disclosure obligations and liability exposure for a DIFC company director who has an undisclosed conflict of interest in a company transaction?",
+      "goldenAnswer": "Under Article 58 of the DIFC Companies Law (DIFC Law No. 5 of 2018), a director must disclose to the board any direct or indirect material interest in a proposed transaction before entry. Failure to disclose: (i) renders the transaction voidable at the company's election; (ii) exposes the director to account for any profit made; and (iii) may constitute a breach of fiduciary duty entitling the company to equitable compensation. Interested directors may not vote on resolutions concerning that transaction.",
+      "category": "corporate-governance",
+      "jurisdiction": "UAE-DIFC",
+      "expected_topics": ["Article 58", "DIFC Companies Law", "conflict of interest", "disclosure", "fiduciary duty"],
+      "difficulty": "hard"
     }
   ],
-  "ny.us.pariksha.eth": [
+  "vidhi.us.pariksha.eth": [
     {
       "id": "us-001",
-      "question": "Under New York contract law, what are the elements required to establish a breach of implied covenant of good faith and fair dealing?",
-      "goldenAnswer": "Under New York law (e.g., 511 W. 232nd Owners Corp. v. Jennifer Realty Co., 98 N.Y.2d 144 (2002)), a breach of the implied covenant of good faith and fair dealing claim requires: (1) the existence of a valid contract; (2) a party's performance of its obligations thereunder; (3) the other party's breach of the covenant; and (4) resulting damages. The covenant cannot be used to create obligations inconsistent with express contractual terms or to imply terms not expressed in the agreement.",
-      "category": "contract"
+      "question": "In Delaware corporate law, how does the Revlon duty differ from the Unocal standard, and when does each apply to a board's decision?",
+      "goldenAnswer": "Revlon duties (Revlon, Inc. v. MacAndrews & Forbes Holdings, 506 A.2d 173 (Del. 1986)) apply when a company is in 'Revlon mode' — i.e., during a sale of control, sale of substantially all assets, or a break-up. Directors must maximise immediate shareholder value. Unocal scrutiny (Unocal Corp. v. Mesa Petroleum Co., 493 A.2d 946 (Del. 1985)) applies to defensive measures against hostile takeovers; the board must show the threat was reasonably perceived and the response proportionate. Business judgment rule applies when neither standard is triggered.",
+      "category": "corporate",
+      "jurisdiction": "US",
+      "expected_topics": ["Revlon", "Unocal", "Delaware", "fiduciary duty", "sale of control"],
+      "difficulty": "hard"
     },
     {
       "id": "us-002",
-      "question": "Under SEC Rule 10b-5, what are the elements a plaintiff must prove in a private securities fraud action?",
-      "goldenAnswer": "Under Stoneridge Investment Partners v. Scientific-Atlanta, 552 U.S. 148 (2008) and prior precedent, a Rule 10b-5 private plaintiff must prove: (1) a material misrepresentation or omission; (2) scienter (intent to deceive or recklessness); (3) a connection with the purchase or sale of a security; (4) reliance (presumed under fraud-on-the-market theory for public companies per Basic Inc. v. Levinson); (5) economic loss; and (6) loss causation (the misrepresentation caused the loss).",
-      "category": "securities"
+      "question": "Under SEC Rule 10b-5, what scienter standard applies post-Janus, and how does scheme liability differ from primary liability after Lorenzo v. SEC?",
+      "goldenAnswer": "Post-Janus Capital Group v. First Derivative Traders (2011), only the 'maker' of a false statement (with ultimate authority) has primary Rule 10b-5(b) liability. Lorenzo v. SEC (2019) clarified that non-makers who disseminate false statements with fraudulent intent can be liable under subsections (a) and (c) (scheme/device liability). Scienter requires knowing or reckless disregard of falsity (Ernst & Ernst v. Hochfelder, 1976). Private plaintiffs need to plead scienter with particularity under the PSLRA.",
+      "category": "securities",
+      "jurisdiction": "US",
+      "expected_topics": ["Rule 10b-5", "scienter", "Janus", "Lorenzo", "scheme liability"],
+      "difficulty": "hard"
     },
     {
       "id": "us-003",
-      "question": "In Delaware corporate law, what is the business judgment rule and when does it shift to the entire fairness standard?",
-      "goldenAnswer": "The business judgment rule in Delaware presumes that directors acted on an informed basis, in good faith, and in honest belief that the action was in the company's best interest (Smith v. Van Gorkom, 488 A.2d 858 (Del. 1985)). The standard shifts to entire fairness (fair dealing + fair price) when: (1) a majority of the board is interested or dominated; (2) in controller transactions; or (3) where board approval was not fully informed. MFW conditions can restore business judgment rule in controller buyouts.",
-      "category": "corporate"
+      "question": "Under DGCL Section 220, what is the proper purpose standard for a stockholder's demand to inspect corporate books and records?",
+      "goldenAnswer": "Under DGCL Section 220, a stockholder must demonstrate a credible basis from which the court can infer possible mismanagement or wrongdoing — a 'proper purpose.' Per High River Limited Partnership v. Mylan Laboratories (2008) and Seinfeld v. Verizon Communications (Del. Ch.), a stockholder need not prove actual wrongdoing, only a credible basis. The inspection is limited to books and records essential and sufficient to the stated purpose. Boards can redact privileged or commercially sensitive information not necessary to the stated purpose.",
+      "category": "corporate",
+      "jurisdiction": "US",
+      "expected_topics": ["DGCL Section 220", "books and records", "proper purpose", "credible basis", "Delaware"],
+      "difficulty": "medium"
     },
     {
       "id": "us-004",
-      "question": "Under the FAA, on what grounds can a federal court vacate a commercial arbitration award?",
-      "goldenAnswer": "Under 9 U.S.C. § 10, a federal court may vacate an arbitration award where: (1) the award was procured by corruption, fraud, or undue means; (2) there was evident partiality or corruption in the arbitrators; (3) the arbitrators were guilty of misconduct in refusing to postpone the hearing, refusing to hear pertinent evidence, or other misbehavior prejudicing a party's rights; or (4) the arbitrators exceeded their powers or imperfectly executed them. Courts apply manifest disregard of the law in some circuits as an additional (non-statutory) ground.",
-      "category": "arbitration"
+      "question": "Under Section 11 of the Securities Act 1933, what due diligence defense is available to an underwriter, and how has the standard evolved post-WorldCom?",
+      "goldenAnswer": "Section 11 imposes strict liability on issuers and expert liability on underwriters for material misstatements in a registration statement. Underwriters can assert the due diligence defense by showing: for expertised portions — reasonable reliance; for non-expertised portions — reasonable investigation yielding reasonable belief that no misstatement existed. Post-WorldCom (In re WorldCom, Inc. Sec. Litig., S.D.N.Y. 2004), courts apply a contextually heightened standard — underwriters must go beyond auditor representations and conduct independent diligence on red flags.",
+      "category": "securities",
+      "jurisdiction": "US",
+      "expected_topics": ["Section 11", "Securities Act", "due diligence defense", "underwriter", "registration statement"],
+      "difficulty": "hard"
     },
     {
       "id": "us-005",
-      "question": "What constitutes a 'material adverse change' (MAC) clause trigger in a New York-governed M&A agreement under recent case law?",
-      "goldenAnswer": "In Akorn, Inc. v. Fresenius Kabi AG (Del. Ch. 2018), the Delaware Court of Chancery (applying similar principles adopted in New York) held that a MAC must be measured against the long-term prospects of the company as a whole. A buyer must show: (1) a significant decline in target's business; (2) the decline is durationally significant (not short-term); and (3) the decline is not caused by an exception carved out in the MAC clause (such as general industry conditions). IBF v. Tyson Foods (2020) reaffirmed these principles.",
-      "category": "m-and-a"
+      "question": "Under Delaware General Corporation Law Section 102(b)(7), to what extent can a charter provision exculpate officers (post-2022 amendment) in addition to directors from personal liability?",
+      "goldenAnswer": "The 2022 DGCL amendment extended Section 102(b)(7) exculpation to officers (previously only directors), effective August 1, 2022. Officers can be exculpated from personal monetary liability for duty of care breaches. Exceptions (non-exculpable): duty of loyalty breaches, bad faith acts, knowing violations of law, and transactions from which the officer derived an improper personal benefit. Officers cannot be exculpated for derivative claims by stockholders unless an independent committee approves. The 2022 amendment does not apply to pre-existing acts.",
+      "category": "corporate",
+      "jurisdiction": "US",
+      "expected_topics": ["DGCL Section 102(b)(7)", "exculpation", "officers", "2022 amendment", "duty of loyalty"],
+      "difficulty": "hard"
     }
   ]
 }
