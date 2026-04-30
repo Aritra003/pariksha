@@ -42,9 +42,11 @@ interface Run {
 
 interface Badge {
   id: string
+  agent_ens: string
   badge_type: string
+  badge_token_id: string | null
+  threshold_data: Record<string, unknown> | null
   minted_at: string | null
-  tx_hash: string | null
 }
 
 function ageDays(minted_at: string | null | undefined): string {
