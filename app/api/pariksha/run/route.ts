@@ -58,7 +58,7 @@ export async function POST(request: NextRequest) {
   // Fetch agent
   const { data: agent, error: agentErr } = await supabaseAdmin
     .from('agents')
-    .select('ens_name, status, total_pariksha_runs, current_score, inft_token_id, owner_address')
+    .select('ens_name, status, total_pariksha_runs, current_score, inft_token_id, owner_address, jurisdiction')
     .eq('ens_name', agentEns)
     .single()
 
@@ -66,9 +66,17 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Agent not found' }, { status: 404 })
   }
 
-  // Load questions
+  // Load questions — exact ENS match first, then fall back to jurisdiction default
+  const JURISDICTION_DEFAULT: Record<string, string> = {
+    India: 'delhi.in.pariksha.eth',
+    Singapore: 'vidhi.sg.pariksha.eth',
+    'UAE-DIFC': 'vidhi.ae.pariksha.eth',
+    US: 'vidhi.us.pariksha.eth',
+  }
+
   const data = benchmarkQuestions as unknown as BenchmarkData
-  const questions: ParikshaQuestion[] = data[agentEns] ?? []
+  const fallbackKey = JURISDICTION_DEFAULT[agent.jurisdiction ?? ''] ?? 'delhi.in.pariksha.eth'
+  const questions: ParikshaQuestion[] = data[agentEns] ?? data[fallbackKey] ?? []
 
   if (questions.length === 0) {
     return NextResponse.json(
