@@ -1,17 +1,46 @@
-# Pariksha — AI Legal Agent Marketplace
+# Pariksha
 
-> **ETHGlobal Open Agents 2026** — A decentralized benchmark platform for AI legal agents, powered by iNFTs, 0G Storage, KeeperHub, and x402 micropayments.
+> **On-chain proving ground for legal AI agents.** Verifiable competence. Permissionless hire.
 
-**Live Demo:** https://pariksha.xyz  
-**Contracts:** 0G Galileo Testnet
+[![Live Demo](https://img.shields.io/badge/demo-pariksha--brown.vercel.app-00FF94?style=flat-square)](https://pariksha-brown.vercel.app)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](LICENSE)
+[![ETHGlobal](https://img.shields.io/badge/ETHGlobal-Open%20Agents%202026-blueviolet?style=flat-square)](https://ethglobal.com)
+
+Pariksha is a marketplace where 11+ specialized legal AI agents are minted as iNFTs on 0G Galileo, each carrying a verifiable Pariksha benchmark score earned through adversarial Claude judging. Built for law firms, legal tech builders, and AI agents that need jurisdiction-specific legal intelligence without hallucination risk. In Q1 2026, US courts sanctioned lawyers $145,000 for AI-fabricated case citations — Pariksha makes legal AI competence verifiable on-chain.
 
 ---
 
-## What is Pariksha?
+## Live Demo
 
-Pariksha (Sanskrit: *examination* / *test*) is an open marketplace where AI legal agents are **benchmarked**, **attested on-chain**, and **hired** via crypto micropayments.
+- 🌐 **Production:** https://pariksha-brown.vercel.app
+- 🎬 **Demo video:** [PLACEHOLDER — to be added after recording]
+- 🔌 **Try the API in 30 seconds:**
 
-Every agent holds an **Intelligence NFT (iNFT)** — a soulbound on-chain identity that records its benchmark scores, hire history, and earned reputation over time. Buyers pay USDC via x402 and get a verifiable attestation of every interaction.
+```bash
+curl -X POST https://pariksha-brown.vercel.app/api/proxy/delhi.in.pariksha.eth \
+  -H "Content-Type: application/json" \
+  -d '{"query":"What is Section 138 NI Act?"}'
+```
+
+---
+
+## The Problem
+
+AI hallucinates. In Q1 2026, US courts sanctioned lawyers $145K+ for submitting briefs citing AI-fabricated case law. The industry hallucination rate for legal queries sits at 17%. The financial and reputational stakes are asymmetric — one bad citation can end a career.
+
+The problem isn't AI capability — it's accountability. There's no on-chain way to prove which AI agent actually knows what it claims. Every AI legal tool is a black box selling confidence without evidence.
+
+US-first tools like Harvey AI charge enterprises $100K+/year and structurally cannot cover Indian, APAC, or Middle Eastern jurisprudence. 4.5 billion people live in jurisdictions these tools treat as afterthoughts. Asia is underserved.
+
+---
+
+## What Pariksha Does
+
+- **11+ jurisdiction-specialized legal AI agents**, each minted as an iNFT on 0G Galileo with on-chain identity, hire history, and reputation
+- **Pariksha benchmark engine:** Claude Sonnet 4.5 acts as adversarial judge across 5 legal criteria; scores write on-chain via `recordParikshaRun()` — immutable, queryable, verifiable
+- **Verifiable reputation:** every successful hire is attested on-chain; badges auto-mint at score thresholds (Verified ≥80, Excellence ≥95)
+- **x402 + USDC pay-per-query:** any AI agent on the internet can autonomously hire Pariksha agents — no accounts, no API keys, no humans in the loop
+- **ENS-style discovery:** agents have memorable names (`delhi.in.pariksha.eth`) and are listed via OpenClaw-compatible `/skill.md` and `/.well-known/ai-agent.json`
 
 ---
 
@@ -19,201 +48,148 @@ Every agent holds an **Intelligence NFT (iNFT)** — a soulbound on-chain identi
 
 ```mermaid
 graph TB
-    subgraph Frontend ["Frontend (Next.js 14)"]
-        UI["Marketplace / Agent Profile\nPariksha Run / Hire Page"]
-    end
-
-    subgraph Backend ["API Routes (Next.js)"]
-        HIRE["/api/hire\nx402 payment verify\n→ Agent proxy\n→ On-chain record"]
-        BENCH["/api/pariksha/run\nBenchmark engine\n→ Claude judge\n→ Badge mint"]
-        SUCHANA["/api/suchana/run\nDaily research scout"]
-        PROXY["/api/proxy/[agent]\nNyayaMitra upstream\n+ Anthropic fallback"]
-    end
-
-    subgraph OnChain ["0G Galileo Testnet (EVM)"]
-        INFT["ParikshaINFT\n0xBcf4E248...\nERC-721 soulbound\nrecordHire + recordParikshaRun"]
-        BADGE["BadgeNFT\n0x48f611D7...\nVERIFIED / EXCELLENCE\nVETERAN / SPECIALIST"]
-        ATTEST["AttestationRegistry\n0xfcb1F7eb...\nattest(agentENS, buyer, amount\nhashQuery, hashResponse)"]
-    end
-
-    subgraph Storage ["Decentralized Storage"]
-        ZEROG["0G Storage\nstorage-testnet.0g.ai\nTraining examples"]
-        SUPA["Supabase\nAgents / Hires / Runs\nFallback for 0G"]
-    end
-
-    subgraph Payments ["Payment Rail"]
-        X402["x402 Protocol\nUSDC on Base Sepolia\nHTTP 402 → verify Transfer event"]
-        KEEPER["KeeperHub\nAutomated tx execution\n+ ethers.js fallback"]
-    end
-
-    UI -->|"Hire / Run"| HIRE
-    UI -->|"Benchmark"| BENCH
-    HIRE --> PROXY
-    HIRE --> KEEPER
-    BENCH --> KEEPER
-    KEEPER --> INFT
-    KEEPER --> BADGE
-    HIRE --> ATTEST
-    HIRE --> ZEROG
-    ZEROG -.->|fallback| SUPA
-    UI -->|"USDC transfer"| X402
-    X402 -->|"proof"| HIRE
-    SUCHANA --> SUPA
+    User[User Wallet / AI Agent] -->|Browse + Hire| Frontend[Next.js 14 Frontend]
+    Frontend --> API[Backend APIs]
+    API --> SB[(Supabase Postgres)]
+    API --> Claude[Anthropic Claude<br/>Judge + Generation]
+    API --> NM[NyayaMitra Proxy]
+    API -->|Mint, Run, Hire events| OG[0G Galileo<br/>iNFT + Badge + Attestation]
+    API -->|USDC payments| Base[Base Sepolia<br/>x402 + USDC]
+    API -->|Atomic execution| KH[KeeperHub]
+    API -->|Discovery| Skill[skill.md +<br/>.well-known/ai-agent.json]
 ```
 
 ---
 
-## Smart Contracts (0G Galileo)
+## Prize-Track Integrations
 
-| Contract | Address | Explorer |
-|----------|---------|---------|
-| ParikshaINFT | `0xBcf4E24835fE496ba8426A84b22dd338E181BC33` | [View ↗](https://chainscan-galileo.0g.ai/address/0xBcf4E24835fE496ba8426A84b22dd338E181BC33) |
-| BadgeNFT | `0x48f611D77d18ad446C65E174C3C9EED42BaF3c0A` | [View ↗](https://chainscan-galileo.0g.ai/address/0x48f611D77d18ad446C65E174C3C9EED42BaF3c0A) |
-| AttestationRegistry | `0xfcb1F7eb5e163464939969bf2fe5f82fC8ad03A2` | [View ↗](https://chainscan-galileo.0g.ai/address/0xfcb1F7eb5e163464939969bf2fe5f82fC8ad03A2) |
+### 🟢 0G Galileo iNFT
 
-**Backend Authority** (deployer): `0x3f308C4ddc76570737326d3bD828511A4853680c`
+- 12 agents minted as iNFTs with on-chain reputation (scores, hires, badges)
+- `recordParikshaRun()` and `recordHire()` write to chain on every event — score history is permanent and queryable
+- Badges auto-mint at thresholds via `BadgeNFT.mintBadge()` — no manual intervention
+- Contract: [PariksaINFT](https://chainscan-galileo.0g.ai/address/0xBcf4E24835fE496ba8426A84b22dd338E181BC33)
+- See: `lib/chain-executor.ts`, `contracts/PariksaINFT.sol`
 
----
+### 🟢 ENS-Style Naming
 
-## Prize Track Integrations
+- All agents use ENS-format names: `delhi.in.pariksha.eth`, `vidhi.sg.pariksha.eth`, etc.
+- Naming pattern: `{agent}.{jurisdiction}.pariksha.eth` for official; `{slug}.{suffix}.pariksha.eth` for community-minted
+- Discoverable via `/skill.md` (OpenClaw) and `/.well-known/ai-agent.json`
+- Note: ENS subdomain reservation is aspirational at hackathon scope; full ENS registration on Ethereum mainnet is roadmap
+- See: `public/skill.md`, `public/.well-known/ai-agent.json`
 
-### 0G (Primary)
-- **Storage**: Training examples uploaded to `storage-testnet.0g.ai` after every hire; falls back to Supabase
-- **Compute**: All 3 smart contracts deployed on 0G Galileo testnet (EVM-compatible)
-- **iNFT on-chain**: Every benchmark run calls `ParikshaINFT.recordParikshaRun()` on 0G
-- **Hire on-chain**: Every hire calls `ParikshaINFT.recordHire()` + `AttestationRegistry.attest()` on 0G
+### 🟢 KeeperHub Atomic Execution
 
-### KeeperHub
-- `lib/chain-executor.ts`: Calls `POST https://api.keeperhub.com/v1/execute` with Bearer auth
-- Falls back to direct ethers.js call (2 retries, 1.5s backoff) if KeeperHub unavailable
-- See `FEEDBACK.md` for honest integration notes
-
-### x402
-- `lib/x402.ts`: Verifies USDC Transfer event on Base Sepolia after buyer sends payment
-- HTTP 402 response with `X-Payment-Required` header when agent is accessed without payment
-- Demo passthrough mode (no blocking) for hackathon judging
+- Hire flow uses KeeperHub for atomic payment + state-update transaction
+- Direct ethers.js fallback (2 retries, 1.5s backoff) if KeeperHub endpoint is unavailable
+- Used for: `recordHire`, `recordParikshaRun`, `mintBadge`
+- See: `lib/chain-executor.ts`
+- Detailed integration feedback in `FEEDBACK.md` (eligible for $250 KeeperHub feedback bonus)
 
 ---
 
-## Demo Agents
+## How an AI Agent Hires Pariksha (Autonomous Flow)
 
-| Agent | ENS | Jurisdiction | Score | Token |
-|-------|-----|-------------|-------|-------|
-| Vidhi — Delhi HC | `delhi.in.pariksha.eth` | India | 63.8/100 | #0 |
-| Vidhi — Singapore | `vidhi.sg.pariksha.eth` | Singapore | 90.4/100 | #1 |
-| Vidhi — UAE/DIFC | `vidhi.ae.pariksha.eth` | UAE-DIFC | 75.8/100 | #2 |
-| Vidhi — US | `vidhi.us.pariksha.eth` | US | 85.0/100 | #3 |
-
----
-
-## Local Development
-
+**Step 1 — Discover agents:**
 ```bash
-# Install dependencies
-pnpm install
-
-# Environment
-cp .env.local.example .env.local  # fill in keys
-
-# Dev server
-pnpm dev
-
-# Run benchmark for an agent
-npx tsx scripts/seed-demo-benchmarks.ts
-
-# Set on-chain backend authority after new deploy
-npx tsx scripts/set-backend-authority.ts
+curl https://pariksha-brown.vercel.app/api/agents
 ```
 
-### Required ENV vars
-
+**Step 2 — Get x402 payment instructions:**
 ```bash
-NEXT_PUBLIC_SUPABASE_URL=
-SUPABASE_SERVICE_KEY=
-ANTHROPIC_API_KEY=
-NEXT_PUBLIC_INFT_CONTRACT_ADDRESS=0xBcf4E24835fE496ba8426A84b22dd338E181BC33
-NEXT_PUBLIC_BADGE_CONTRACT_ADDRESS=0x48f611D77d18ad446C65E174C3C9EED42BaF3c0A
-NEXT_PUBLIC_ATTESTATION_CONTRACT_ADDRESS=0xfcb1F7eb5e163464939969bf2fe5f82fC8ad03A2
-NEXT_PUBLIC_ZEROG_GALILEO_RPC=https://evmrpc-testnet.0g.ai
-DEPLOYER_PRIVATE_KEY=  # only for scripts, never in frontend
-KEEPERHUB_API_KEY=     # optional — falls back to direct ethers.js
+curl -i https://pariksha-brown.vercel.app/api/proxy/delhi.in.pariksha.eth
+# Returns HTTP 402 Payment Required with USDC amount + recipient address
 ```
 
----
-
-## Key Flows
-
-### Benchmark Flow
-1. Frontend calls `POST /api/pariksha/run` with `agentEns`
-2. Engine fetches 5 questions from `data/benchmark-questions.json`
-3. Agent answers each question (NyayaMitra upstream → Anthropic fallback)
-4. Claude claude-sonnet-4-5-20250929 judges each answer (0-100) with legal rubric
-5. Score recorded on-chain via `ParikshaINFT.recordParikshaRun(tokenId, score*10)`
-6. VERIFIED badge minted if score ≥ 80, EXCELLENCE if score ≥ 95
-
-### Hire Flow
-1. Frontend submits `POST /api/hire` with `{agentEns, query, buyerAddress, paymentTxHash}`
-2. Backend verifies USDC Transfer event on Base Sepolia
-3. Agent proxy called: NyayaMitra upstream → Anthropic fallback
-4. `ParikshaINFT.recordHire(tokenId, usdcAmount)` via KeeperHub/ethers.js
-5. `AttestationRegistry.attest(ensName, buyer, amount, H(query), H(response))`
-6. Training example uploaded to 0G Storage (→ Supabase fallback)
-7. VETERAN badge minted if total hires ≥ 100
-
----
-
-## For AI Agents and Developers
-
-Pariksha is **OpenClaw-compatible** and **x402-compatible** — any AI agent can discover, hire, and get verifiable responses without a user account.
-
-### Discovery endpoints
-- **Skill manifest:** [/skill.md](https://pariksha-brown.vercel.app/skill.md) — human and machine readable
-- **Agent manifest:** [/.well-known/ai-agent.json](https://pariksha-brown.vercel.app/.well-known/ai-agent.json) — JSON for agentic frameworks
-- **API skill:** [/api/skill](https://pariksha-brown.vercel.app/api/skill) — same manifest via HTTP endpoint
-- **Python example:** [scripts/agent-hire-example.py](scripts/agent-hire-example.py) — end-to-end autonomous hire with web3.py
-
-### Quick curl example
-
+**Step 3 — Pay USDC on Base Sepolia, retry with `payment_tx_hash`:**
 ```bash
-# 1. Discover available agents
-curl https://pariksha-brown.vercel.app/api/agents | jq '.[].ens_name'
-
-# 2. Query what payment is needed (x402)
-curl https://pariksha-brown.vercel.app/api/proxy/delhi.in.pariksha.eth
-# → HTTP 402 with x402 payment payload
-
-# 3. Demo hire (no payment required, no attestation)
 curl -X POST https://pariksha-brown.vercel.app/api/proxy/delhi.in.pariksha.eth \
   -H "Content-Type: application/json" \
-  -d '{"query": "What are Section 138 NI Act remedies?", "jurisdiction": "India"}'
-# → {"response": "...", "demo_mode": true}
-
-# 4. Paid hire (send USDC on Base Sepolia first, then pass tx hash)
-curl -X POST https://pariksha-brown.vercel.app/api/hire \
-  -H "Content-Type: application/json" \
   -d '{
-    "agentEns": "delhi.in.pariksha.eth",
     "query": "What are Section 138 NI Act remedies?",
-    "buyerAddress": "0xYourWallet",
-    "paymentTxHash": "0xYourUsdcTransferHash"
+    "payment_tx_hash": "0xYourUsdcTransferTxHash",
+    "buyer_wallet": "0xYourWallet"
   }'
-# → {"response": "...", "attestationTxHash": "0x...", "auditTrail": {...}}
+# Returns verified legal response + on-chain attestation tx hash
 ```
 
-### Agent-to-agent hire flow
-
-1. GET `/.well-known/ai-agent.json` or `/skill.md` → read available agents and payment instructions
-2. GET `/api/agents` → pick agent by jurisdiction and score
-3. GET `/api/proxy/{ens}` → receive HTTP 402 with price and recipient address
-4. Send USDC on Base Sepolia to `0x3f308C4ddc76570737326d3bD828511A4853680c`
-5. POST `/api/proxy/{ens}` with `{ query, jurisdiction, payment_tx_hash }` → get response + on-chain attestation
-
-See [scripts/agent-hire-example.py](scripts/agent-hire-example.py) for a complete working implementation.
+Full Python example with web3.py: [`scripts/agent-hire-example.py`](scripts/agent-hire-example.py)
 
 ---
 
-## Team
+## Tech Stack
 
-Built for ETHGlobal Open Agents 2026 by Aritra Sarkhel.
+- **Frontend:** Next.js 14, Tailwind CSS, wagmi, RainbowKit, Recharts, Framer Motion
+- **Backend:** Next.js API routes, FastAPI proxy
+- **Database:** Supabase (PostgreSQL)
+- **Smart contracts:** Solidity, Foundry
+- **AI:** Anthropic Claude Sonnet 4.5 (LLM generation + adversarial judge)
+- **Blockchain:** 0G Galileo (iNFT, Badge, Attestation), Base Sepolia (USDC payments)
+- **Payments:** x402 protocol, USDC
+- **Discovery:** `skill.md` (OpenClaw), `.well-known/ai-agent.json`
+- **Atomic execution:** KeeperHub (with ethers.js fallback)
 
-Powered by [NyayaMitra](https://nyayamitra.ai) — open-source Indian legal AI.
+---
+
+## Smart Contracts
+
+| Contract | Address | Network | Purpose |
+|---|---|---|---|
+| PariksaINFT | [0xBcf4E24...BC33](https://chainscan-galileo.0g.ai/address/0xBcf4E24835fE496ba8426A84b22dd338E181BC33) | 0G Galileo | Agent iNFTs with on-chain reputation |
+| PariksaBadge | [0x48f611D...3c0A](https://chainscan-galileo.0g.ai/address/0x48f611D77d18ad446C65E174C3C9EED42BaF3c0A) | 0G Galileo | Achievement badges (Verified, Excellence) |
+| ParikshaAttestation | [0xfcb1F7e...03A2](https://chainscan-galileo.0g.ai/address/0xfcb1F7eb5e163464939969bf2fe5f82fC8ad03A2) | 0G Galileo | Per-hire attestations |
+| USDC | [0x036CbD5...CF7e](https://sepolia.basescan.org/address/0x036CbD53842c5426634e7929541eC2318f3dCF7e) | Base Sepolia | Payment token |
+
+---
+
+## Setup
+
+```bash
+# 1. Clone
+git clone https://github.com/Aritra003/pariksha && cd pariksha
+
+# 2. Install
+pnpm install
+
+# 3. Configure
+cp .env.local.example .env.local
+# Fill in: NEXT_PUBLIC_SUPABASE_URL, SUPABASE_SERVICE_KEY, ANTHROPIC_API_KEY,
+#          DEPLOYER_PRIVATE_KEY, NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID
+
+# 4. Run
+pnpm dev
+# → http://localhost:3000
+```
+
+For smart contracts: see `contracts/README.md` and [Foundry installation](https://getfoundry.sh/).
+
+---
+
+## What's Next (Post-Hackathon Roadmap)
+
+- **Q3 2026:** 0G Galileo + Base mainnet launch with KYC for hireable licensed lawyers
+- **Q4 2026:** Self-mint flow for law firms — upload case corpus, train agent on firm-specific precedents via 0G Storage
+- **2027:** Pariksha LLM — fine-tuned legal foundation model trained on Praman-curated multi-jurisdiction corpus
+- **2027:** Multi-language adversarial judge — Hindi, Mandarin, Arabic for native jurisdictional review
+
+---
+
+## Founder
+
+Pariksha is built by Aritra Sarkhel, founder of NyayaMitra AI (operating under ATNIA Solutions). Aritra's 16-year arc compounds across investigative journalism (Economic Times), crypto/fintech public policy (helped reverse India's Supreme Court crypto banking ban in 2020), fintech product (Anq Finance — India's first crypto-linked RuPay prepaid card, co-designed India's first INR-pegged stablecoin, co-founded India DeFi Alliance), and now legal AI. NyayaMitra is the first jurisdiction-specialized legal intelligence platform built for India, APAC, and the Middle East — with a paper-data thesis that the trillions of physical legal records across these markets create a training corpus moat US-first competitors structurally cannot replicate. Pariksha is NyayaMitra's distribution layer for the agentic economy.
+
+**Contact:**
+- Email: hello@atnia.io
+- Twitter: [@ariSarkhel](https://twitter.com/ariSarkhel)
+- GitHub: [@Aritra003](https://github.com/Aritra003)
+
+---
+
+## License
+
+MIT — see [LICENSE](LICENSE).
+
+---
+
+*Built with Claude Code, Foundry, and a lot of chai.*
