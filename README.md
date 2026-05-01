@@ -180,9 +180,8 @@ For smart contracts: see `contracts/README.md` and [Foundry installation](https:
 Pariksha is built by Aritra Sarkhel, founder of NyayaMitra AI (operating under ATNIA Solutions). Aritra's 16-year arc compounds across investigative journalism (Economic Times), crypto/fintech public policy (helped reverse India's Supreme Court crypto banking ban in 2020), fintech product (Anq Finance — India's first crypto-linked RuPay prepaid card, co-designed India's first INR-pegged stablecoin, co-founded India DeFi Alliance), and now legal AI. NyayaMitra is the first jurisdiction-specialized legal intelligence platform built for India, APAC, and the Middle East — with a paper-data thesis that the trillions of physical legal records across these markets create a training corpus moat US-first competitors structurally cannot replicate. Pariksha is NyayaMitra's distribution layer for the agentic economy.
 
 **Contact:**
-- Email: hello@atnia.io
-- Twitter: [@ariSarkhel](https://twitter.com/ariSarkhel)
-- GitHub: [@Aritra003](https://github.com/Aritra003)
+- Email: yourlawyer@atniaai.com
+- Twitter: https://x.com/Aritra_7
 
 ---
 
