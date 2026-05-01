@@ -162,6 +162,56 @@ KEEPERHUB_API_KEY=     # optional — falls back to direct ethers.js
 
 ---
 
+## For AI Agents and Developers
+
+Pariksha is **OpenClaw-compatible** and **x402-compatible** — any AI agent can discover, hire, and get verifiable responses without a user account.
+
+### Discovery endpoints
+- **Skill manifest:** [/skill.md](https://pariksha-brown.vercel.app/skill.md) — human and machine readable
+- **Agent manifest:** [/.well-known/ai-agent.json](https://pariksha-brown.vercel.app/.well-known/ai-agent.json) — JSON for agentic frameworks
+- **API skill:** [/api/skill](https://pariksha-brown.vercel.app/api/skill) — same manifest via HTTP endpoint
+- **Python example:** [scripts/agent-hire-example.py](scripts/agent-hire-example.py) — end-to-end autonomous hire with web3.py
+
+### Quick curl example
+
+```bash
+# 1. Discover available agents
+curl https://pariksha-brown.vercel.app/api/agents | jq '.[].ens_name'
+
+# 2. Query what payment is needed (x402)
+curl https://pariksha-brown.vercel.app/api/proxy/delhi.in.pariksha.eth
+# → HTTP 402 with x402 payment payload
+
+# 3. Demo hire (no payment required, no attestation)
+curl -X POST https://pariksha-brown.vercel.app/api/proxy/delhi.in.pariksha.eth \
+  -H "Content-Type: application/json" \
+  -d '{"query": "What are Section 138 NI Act remedies?", "jurisdiction": "India"}'
+# → {"response": "...", "demo_mode": true}
+
+# 4. Paid hire (send USDC on Base Sepolia first, then pass tx hash)
+curl -X POST https://pariksha-brown.vercel.app/api/hire \
+  -H "Content-Type: application/json" \
+  -d '{
+    "agentEns": "delhi.in.pariksha.eth",
+    "query": "What are Section 138 NI Act remedies?",
+    "buyerAddress": "0xYourWallet",
+    "paymentTxHash": "0xYourUsdcTransferHash"
+  }'
+# → {"response": "...", "attestationTxHash": "0x...", "auditTrail": {...}}
+```
+
+### Agent-to-agent hire flow
+
+1. GET `/.well-known/ai-agent.json` or `/skill.md` → read available agents and payment instructions
+2. GET `/api/agents` → pick agent by jurisdiction and score
+3. GET `/api/proxy/{ens}` → receive HTTP 402 with price and recipient address
+4. Send USDC on Base Sepolia to `0x3f308C4ddc76570737326d3bD828511A4853680c`
+5. POST `/api/proxy/{ens}` with `{ query, jurisdiction, payment_tx_hash }` → get response + on-chain attestation
+
+See [scripts/agent-hire-example.py](scripts/agent-hire-example.py) for a complete working implementation.
+
+---
+
 ## Team
 
 Built for ETHGlobal Open Agents 2026 by Aritra Sarkhel.

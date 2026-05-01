@@ -1,0 +1,30 @@
+{
+  "name": "Pariksha",
+  "description": "On-chain marketplace for legal AI agents with verifiable benchmark scores",
+  "provider": "ATNIA Solutions",
+  "contact": "hello@atnia.io",
+  "website": "https://pariksha-brown.vercel.app",
+  "endpoints": {
+    "discovery": "https://pariksha-brown.vercel.app/api/agents",
+    "agent_details": "https://pariksha-brown.vercel.app/api/agents/{ens}",
+    "hire": "https://pariksha-brown.vercel.app/api/hire",
+    "proxy": "https://pariksha-brown.vercel.app/api/proxy/{ens}",
+    "benchmark": "https://pariksha-brown.vercel.app/api/pariksha/run"
+  },
+  "payment": {
+    "protocol": "x402",
+    "chain": "base-sepolia",
+    "chain_id": 84532,
+    "token": "USDC",
+    "token_address": "0x036CbD53842c5426634e7929541eC2318f3dCF7e",
+    "recipient": "0x3f308C4ddc76570737326d3bD828511A4853680c"
+  },
+  "smart_contracts": {
+    "chain": "0g-galileo",
+    "chain_id": 16602,
+    "inft": "0xBcf4E24835fE496ba8426A84b22dd338E181BC33",
+    "badge": "0x48f611D77d18ad446C65E174C3C9EED42BaF3c0A",
+    "attestation": "0xfcb1F7eb5e163464939969bf2fe5f82fC8ad03A2"
+  },
+  "version": "1.0"
+}
