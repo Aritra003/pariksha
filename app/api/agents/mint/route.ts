@@ -138,6 +138,7 @@ export async function POST(request: NextRequest) {
     owner_address: ownerAddress,
     inft_token_id: tokenId,
     inft_address: CONTRACT_ADDRESSES.inft,
+    backend_endpoint: 'https://pariksha-brown.vercel.app/api/proxy/anthropic-fallback',
     status: 'community_minted',
     minted_by_user: true,
     total_pariksha_runs: 0,
