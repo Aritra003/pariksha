@@ -1,16 +1,32 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { RainbowKitProvider, getDefaultConfig, darkTheme } from '@rainbow-me/rainbowkit'
-import { WagmiProvider } from 'wagmi'
+import {
+  RainbowKitProvider,
+  connectorsForWallets,
+  darkTheme,
+} from '@rainbow-me/rainbowkit'
+import { metaMaskWallet } from '@rainbow-me/rainbowkit/wallets'
+import { createConfig, WagmiProvider, http } from 'wagmi'
 import { sepolia, baseSepolia } from 'wagmi/chains'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import '@rainbow-me/rainbowkit/styles.css'
 
-const config = getDefaultConfig({
-  appName: 'Pariksha',
-  projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID ?? 'demo',
+const connectors = connectorsForWallets(
+  [{ groupName: 'Recommended', wallets: [metaMaskWallet] }],
+  {
+    appName: 'Pariksha',
+    projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID ?? 'demo',
+  }
+)
+
+const config = createConfig({
+  connectors,
   chains: [sepolia, baseSepolia],
+  transports: {
+    [sepolia.id]: http(),
+    [baseSepolia.id]: http(),
+  },
   ssr: true,
 })
 
