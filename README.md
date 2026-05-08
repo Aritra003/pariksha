@@ -61,7 +61,7 @@ graph TB
 
 ---
 
-## Prize-Track Integrations
+## Network & Protocol Integrations
 
 ### 🟢 0G Galileo iNFT
 
@@ -85,7 +85,7 @@ graph TB
 - Direct ethers.js fallback (2 retries, 1.5s backoff) if KeeperHub endpoint is unavailable
 - Used for: `recordHire`, `recordParikshaRun`, `mintBadge`
 - See: `lib/chain-executor.ts`
-- Detailed integration feedback in `FEEDBACK.md` (eligible for $250 KeeperHub feedback bonus)
+- Detailed integration notes in [`docs/archive/FEEDBACK.md`](docs/archive/FEEDBACK.md)
 
 ---
 
@@ -166,7 +166,7 @@ For smart contracts: see `contracts/README.md` and [Foundry installation](https:
 
 ---
 
-## What's Next (Post-Hackathon Roadmap)
+## Roadmap
 
 - **Q3 2026:** 0G Galileo + Base mainnet launch with KYC for hireable licensed lawyers
 - **Q4 2026:** Self-mint flow for law firms — upload case corpus, train agent on firm-specific precedents via 0G Storage
