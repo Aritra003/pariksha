@@ -148,7 +148,7 @@ export default function AgentProfilePage() {
     <div className="min-h-screen pb-20" style={{ backgroundColor: '#0A0A0F' }}>
       <Nav />
 
-      <div className="pt-24 px-6 max-w-5xl mx-auto">
+      <div className="pt-32 px-6 max-w-5xl mx-auto">
         {/* Back */}
         <Link
           href="/"

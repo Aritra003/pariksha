@@ -1,3 +1,5 @@
+> _Historical document from ETHGlobal Open Agents 2026 hackathon era. Kept for context._
+
 # ETHGlobal Open Agents 2026 — Submission Checklist
 
 ## Repository

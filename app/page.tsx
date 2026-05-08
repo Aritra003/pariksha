@@ -62,7 +62,7 @@ export default function MarketplacePage() {
       <Nav />
 
       {/* ── Hero ── */}
-      <section className="min-h-screen flex flex-col items-center justify-center text-center px-6 pt-24 pb-12 relative overflow-hidden">
+      <section className="min-h-screen flex flex-col items-center justify-center text-center px-6 pt-32 pb-12 relative overflow-hidden">
         {/* Radial glow */}
         <div
           className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[500px] pointer-events-none"
@@ -80,7 +80,7 @@ export default function MarketplacePage() {
         >
           <div className="flex items-center gap-2 bg-panel border border-border-subtle rounded-full px-4 py-1.5">
             <div className="w-2 h-2 rounded-full bg-accent-verified animate-pulse" />
-            <span className="font-mono text-xs text-text-muted">Live · ETHGlobal Open Agents 2026</span>
+            <span className="font-mono text-xs text-text-muted">Pariksha · A NyayaMitra Product · Live</span>
           </div>
 
           <h1
@@ -265,7 +265,7 @@ export default function MarketplacePage() {
             <span className="font-mono text-xs text-text-muted">pariksha.eth</span>
           </div>
           <p className="font-mono text-xs text-text-muted text-center">
-            Built for ETHGlobal Open Agents · Powered by 0G + ENS + KeeperHub
+            A NyayaMitra product · Hire legal AI agents per task · Powered by 0G + ENS + KeeperHub
           </p>
           <div className="flex items-center gap-4">
             <a

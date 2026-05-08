@@ -158,7 +158,7 @@ export default function HirePage() {
     <div className="min-h-screen pb-20" style={{ backgroundColor: '#0A0A0F' }}>
       <Nav />
 
-      <div className="pt-24 px-6 max-w-2xl mx-auto">
+      <div className="pt-32 px-6 max-w-2xl mx-auto">
         <Link
           href={`/agent/${encodeURIComponent(ens)}`}
           className="inline-flex items-center gap-1.5 font-mono text-xs text-text-muted hover:text-text-primary transition-colors mb-8"

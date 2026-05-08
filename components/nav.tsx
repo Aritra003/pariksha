@@ -9,7 +9,7 @@ export function Nav() {
   const [menuOpen, setMenuOpen] = useState(false)
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 border-b border-border-subtle bg-[#0A0A0F]/90 backdrop-blur-md">
+    <nav className="fixed top-10 left-0 right-0 z-50 border-b border-border-subtle bg-[#0A0A0F]/90 backdrop-blur-md">
       <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
         <Link href="/" className="group flex flex-col items-start">
           <span className="font-display font-semibold text-xl text-text-primary tracking-tight leading-none">

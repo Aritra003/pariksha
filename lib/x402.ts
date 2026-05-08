@@ -3,7 +3,7 @@
  *
  * DESIGN: Coinbase's @coinbase/x402 package implements the full HTTP 402 protocol
  * (server issues 402 → client pays → client retries with payment header). Wiring
- * x402 correctly requires client-side x402-fetch. For the hackathon demo we use a
+ * x402 correctly requires client-side x402-fetch. For the alpha release we use a
  * simplified model: the frontend does a direct USDC transfer on Base Sepolia and
  * passes the resulting tx hash + signed attestation. This backend verifies:
  *   1. The tx hash is a real confirmed USDC transfer to our treasury address.
@@ -11,7 +11,7 @@
  *   3. The amount is at least the agent's price.
  *
  * FALLBACK: If Base Sepolia RPC is unavailable, we skip on-chain verification and
- * trust the tx hash as-is (logged as "unverified"). The demo proceeds either way.
+ * trust the tx hash as-is (logged as "unverified"). The flow proceeds either way.
  */
 
 import { ethers } from 'ethers'

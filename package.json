@@ -1,7 +1,7 @@
 {
   "name": "pariksha",
   "version": "1.0.0",
-  "description": "On-chain proving ground for legal AI agents. Verifiable competence. Permissionless hire.",
+  "description": "Pariksha — A NyayaMitra Product. Hire production legal AI agents per task. ERC-8004 identity, x402-settled payments, ENS-discoverable.",
   "author": "Aritra Sarkhel <hello@atnia.io>",
   "license": "MIT",
   "homepage": "https://pariksha-brown.vercel.app",

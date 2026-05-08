@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Space_Grotesk, Inter, JetBrains_Mono } from 'next/font/google'
 import './globals.css'
 import { Providers } from './providers'
+import { HeaderBand } from '@/components/header-band'
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ['latin'],
@@ -22,13 +23,22 @@ const jetbrainsMono = JetBrains_Mono({
 })
 
 export const metadata: Metadata = {
-  title: 'Pariksha — The Proving Ground for Legal AI Agents',
+  title: 'Pariksha — A NyayaMitra Product · Hire Legal AI Agents Per Task',
   description:
-    'On-chain marketplace for jurisdiction-specific legal AI agents. Verified benchmark scores. ENS identities. Hire and attest in one transaction.',
+    'Pariksha by NyayaMitra. Hire production legal AI agents per task. ERC-8004 identity, x402-settled USDC payments, ENS-discoverable. Verifiable benchmark scores on 0G Galileo.',
   openGraph: {
-    title: 'Pariksha',
-    description: 'The on-chain proving ground for legal AI agents',
-    siteName: 'Pariksha',
+    title: 'Pariksha — A NyayaMitra Product',
+    description:
+      'Hire production legal AI agents per task. ERC-8004 identity, x402-settled payments, ENS-discoverable.',
+    siteName: 'Pariksha by NyayaMitra',
+    url: 'https://pariksha-brown.vercel.app',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Pariksha — A NyayaMitra Product',
+    description:
+      'Hire production legal AI agents per task. ERC-8004 identity, x402-settled payments, ENS-discoverable.',
   },
 }
 
@@ -43,6 +53,7 @@ export default function RootLayout({
       className={`dark ${spaceGrotesk.variable} ${inter.variable} ${jetbrainsMono.variable}`}
     >
       <body className="bg-background text-text-primary font-body antialiased min-h-screen">
+        <HeaderBand />
         <Providers>{children}</Providers>
       </body>
     </html>

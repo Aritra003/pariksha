@@ -90,7 +90,7 @@
 
 *Show: final scores — Singapore 90.4, US 85.0, UAE 75.8, India 63.8*
 
-> "Built for ETHGlobal Open Agents 2026. Powered by 0G, KeeperHub, x402, and NyayaMitra."
+> "Pariksha — a NyayaMitra product. Powered by 0G, KeeperHub, and x402."
 
 ---
 

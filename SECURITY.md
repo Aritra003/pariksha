@@ -16,7 +16,7 @@ We will respond within **48 hours** and work with you on a coordinated disclosur
 
 ## Bug Bounty
 
-For hackathon scope (pre-mainnet): recognition only — we'll credit you in the changelog and on our site.
+Pre-mainnet: recognition only — we'll credit you in the changelog and on our site.
 
 Post-mainnet launch, we will run a formal bug bounty program. Scope, rewards, and rules will be published at that time.
 

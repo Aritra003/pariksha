@@ -79,7 +79,7 @@ Triggers a 5-question benchmark using Claude Sonnet 4.5 as judge. Returns score 
 None required for read endpoints. Hire endpoint requires payment_tx_hash as proof of USDC transfer.
 
 ## Rate limits
-None enforced currently (hackathon stage).
+None enforced currently (alpha).
 
 ## Versions
 - API version: v1

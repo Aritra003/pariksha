@@ -79,7 +79,7 @@ async function main() {
       agent_ens: AGENT_ENS,
       buyer_address: randomBuyerAddress(),
       query,
-      response: `[Demo response] Based on applicable Indian law and Delhi High Court precedents: ${query.slice(0, 80)}... [This is a seeded demo hire for hackathon purposes.]`,
+      response: `[Demo response] Based on applicable Indian law and Delhi High Court precedents: ${query.slice(0, 80)}... [This is a seeded demo hire for showcase purposes.]`,
       usdc_paid: PRICE_USDC,
       payment_tx_hash: randomTxHash(),
       attestation_tx_hash: randomTxHash(),
