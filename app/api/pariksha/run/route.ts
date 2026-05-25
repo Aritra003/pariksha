@@ -72,6 +72,7 @@ export async function POST(request: NextRequest) {
     Singapore: 'vidhi.sg.pariksha.eth',
     'UAE-DIFC': 'vidhi.ae.pariksha.eth',
     US: 'vidhi.us.pariksha.eth',
+    'US-DE': 'vidhi.us.pariksha.eth',
   }
 
   const data = benchmarkQuestions as unknown as BenchmarkData

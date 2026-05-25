@@ -7,6 +7,7 @@ export async function GET() {
   const { data: agents, error } = await supabaseAdmin
     .from('agents')
     .select('*')
+    .neq('status', 'archived')
     .order('status', { ascending: false })
     .order('current_score', { ascending: false, nullsFirst: false })
 

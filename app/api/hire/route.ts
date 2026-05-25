@@ -94,6 +94,7 @@ export async function POST(request: NextRequest) {
   if (agentEns.startsWith('raksha')) slug = 'raksha'
   else if (agentEns.startsWith('kosh')) slug = 'kosh'
   else if (agentEns.startsWith('sahayak')) slug = 'sahayak'
+  else if (agentEns.startsWith('sanvidha')) slug = 'sanvidha'
 
   const host = request.headers.get('host') ?? 'localhost:3000'
   const proto = host.startsWith('localhost') ? 'http' : 'https'

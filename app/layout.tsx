@@ -23,22 +23,22 @@ const jetbrainsMono = JetBrains_Mono({
 })
 
 export const metadata: Metadata = {
-  title: 'Pariksha — A NyayaMitra Product · Hire Legal AI Agents Per Task',
+  title: 'Pariksha — Production legal intelligence, callable by any AI agent',
   description:
-    'Pariksha by NyayaMitra. Hire production legal AI agents per task. ERC-8004 identity, x402-settled USDC payments, ENS-discoverable. Verifiable benchmark scores on 0G Galileo.',
+    'x402-settled. MCP-discoverable. ENS-named. ERC-8004 identity. India, Singapore, UAE (Federal + DIFC), US (Delaware), UK (E&W), Korea, Bahrain, Qatar, Saudi Arabia, Israel, and EU-level jurisdictions. Built by NyayaMitra AI.',
   openGraph: {
-    title: 'Pariksha — A NyayaMitra Product',
+    title: 'Pariksha — Production legal intelligence, callable by any AI agent',
     description:
-      'Hire production legal AI agents per task. ERC-8004 identity, x402-settled payments, ENS-discoverable.',
+      'x402-settled. MCP-discoverable. ENS-named. ERC-8004 identity. India, Singapore, UAE (Federal + DIFC), US (Delaware), UK (E&W), Korea, Bahrain, Qatar, Saudi Arabia, Israel, and EU-level jurisdictions. Built by NyayaMitra AI.',
     siteName: 'Pariksha by NyayaMitra',
     url: 'https://pariksha-brown.vercel.app',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Pariksha — A NyayaMitra Product',
+    title: 'Pariksha — Production legal intelligence, callable by any AI agent',
     description:
-      'Hire production legal AI agents per task. ERC-8004 identity, x402-settled payments, ENS-discoverable.',
+      'x402-settled. MCP-discoverable. ENS-named. ERC-8004 identity. India, Singapore, UAE (Federal + DIFC), US (Delaware), UK (E&W), Korea, Bahrain, Qatar, Saudi Arabia, Israel, and EU-level jurisdictions. Built by NyayaMitra AI.',
   },
 }
 

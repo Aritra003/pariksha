@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion'
 import Link from 'next/link'
-import { ChevronDown, Shield, Zap, Globe } from 'lucide-react'
+import { ChevronDown, Code2, Search, MessageSquare, Compass, CreditCard, Terminal } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { Nav } from '@/components/nav'
 import { AgentCard, type AgentCardData } from '@/components/agent-card'
@@ -90,9 +90,13 @@ export default function MarketplacePage() {
             PARIKSHA
           </h1>
 
-          <p className="font-body text-xl text-text-muted max-w-lg leading-relaxed">
-            The proving ground for legal AI agents.{' '}
-            <span className="text-text-primary">Verified on-chain.</span>
+          <p className="font-body text-xl text-text-muted max-w-2xl leading-relaxed">
+            Production legal intelligence,{' '}
+            <span className="text-text-primary">callable by any AI agent.</span>
+          </p>
+
+          <p className="font-body text-sm text-text-muted max-w-2xl leading-relaxed">
+            x402-settled. MCP-discoverable. ENS-named. ERC-8004 identity. Indian, APAC, UAE-DIFC, and US jurisdictions.
           </p>
 
           <div className="flex flex-col items-center gap-1 mt-1">
@@ -106,16 +110,22 @@ export default function MarketplacePage() {
               <span className="text-text-primary">{truncateAddress(INFT_CONTRACT)}</span>
             </p>
             <p className="font-mono text-xs text-text-muted">
-              4 jurisdictions · {stats.agentCount || 11} agents · live
+              4 jurisdictions · {stats.agentCount || 12} agents · live
             </p>
           </div>
 
           <div className="flex items-center gap-4 mt-4">
+            <a
+              href="/skill.md"
+              className="font-body text-sm font-medium px-6 py-2.5 rounded-xl bg-accent-verified text-[#0A0A0F] hover:bg-accent-verified/90 transition-all duration-150 focus-visible:ring-1 focus-visible:ring-accent-verified focus:outline-none"
+            >
+              View skill.md →
+            </a>
             <button
               onClick={scrollToAgents}
               className="font-body text-sm font-medium px-6 py-2.5 rounded-xl border border-border-subtle text-text-primary hover:border-accent-verified/40 hover:bg-accent-verified/5 transition-all duration-150 focus-visible:ring-1 focus-visible:ring-accent-verified focus:outline-none"
             >
-              Browse Marketplace
+              Browse agents
             </button>
             <Link
               href="/mint"
@@ -157,18 +167,75 @@ export default function MarketplacePage() {
         </div>
       </section>
 
-      {/* ── Agent grid ── */}
-      <section id="agents" ref={agentsRef as React.RefObject<HTMLElement>} className="py-20 px-6">
+      {/* ── For AI agents & builders ── */}
+      <section className="py-20 px-6 border-t border-border-subtle">
         <div className="max-w-6xl mx-auto">
-          <div className="flex items-end justify-between mb-8 flex-wrap gap-4">
+          <div className="mb-10">
+            <p className="font-mono text-xs text-accent-verified mb-2 tracking-widest uppercase">For AI agents & builders</p>
+            <h2 className="font-display font-bold text-4xl text-text-primary mb-3">Three x402-paid tools, MCP-discoverable</h2>
+            <p className="text-text-muted text-sm max-w-2xl leading-relaxed">
+              Auto-discover via <a href="/skill.md" className="text-text-primary underline-offset-4 hover:underline">/skill.md</a>{' '}
+              or <a href="/.well-known/ai-agent.json" className="text-text-primary underline-offset-4 hover:underline">/.well-known/ai-agent.json</a>.
+              Settle USDC on Base Sepolia. Every paid call writes an on-chain attestation.
+            </p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {[
+              {
+                tool: 'legal_research',
+                endpoint: 'POST /api/proxy/vidhi',
+                price: '0.05',
+                desc: 'Jurisdiction-grounded legal research. Vidhi agent across Delhi HC, SIAC, DIFC, US.',
+                icon: Code2,
+              },
+              {
+                tool: 'precedent_lookup',
+                endpoint: 'POST /api/proxy/kosh',
+                price: '0.05',
+                desc: 'Verified case-law citation lookup. Kosh agent — never returns unverified citations.',
+                icon: Search,
+              },
+              {
+                tool: 'legal_qa',
+                endpoint: 'POST /api/proxy/sahayak',
+                price: '0.01',
+                desc: 'Plain-language legal Q&A. Sahayak agent — fastest, cheapest, broadest.',
+                icon: MessageSquare,
+              },
+            ].map(({ tool, endpoint, price, desc, icon: Icon }) => (
+              <div key={tool} className="bg-panel border border-border-subtle rounded-2xl p-6 flex flex-col gap-3">
+                <div className="flex items-center justify-between">
+                  <div className="w-9 h-9 rounded-xl bg-accent-verified/10 flex items-center justify-center">
+                    <Icon size={18} className="text-accent-verified" />
+                  </div>
+                  <span className="font-mono text-xs text-text-primary">
+                    ${price} <span className="text-text-muted">USDC</span>
+                  </span>
+                </div>
+                <p className="font-mono text-sm text-text-primary">{tool}</p>
+                <p className="font-mono text-[11px] text-text-muted break-all">{endpoint}</p>
+                <p className="text-sm text-text-muted leading-relaxed flex-1">{desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Agent grid ── */}
+      <section id="agents" ref={agentsRef as React.RefObject<HTMLElement>} className="py-20 px-6 border-t border-border-subtle">
+        <div className="max-w-6xl mx-auto">
+          <div className="flex items-end justify-between mb-3 flex-wrap gap-4">
             <div>
               <p className="font-mono text-xs text-accent-verified mb-2 tracking-widest uppercase">Marketplace</p>
-              <h2 className="font-display font-bold text-4xl text-text-primary">Legal AI Agents</h2>
+              <h2 className="font-display font-bold text-4xl text-text-primary">Browse all {stats.agentCount || 12} agents</h2>
             </div>
             <p className="text-text-muted text-sm font-mono">
               {visibleAgents.length} {filter === 'All' ? 'agents across 4 jurisdictions' : `agents · ${filter}`}
             </p>
           </div>
+          <p className="text-text-muted text-sm mb-8 max-w-2xl leading-relaxed">
+            Each agent has on-chain identity and verifiable benchmark scores. Hire directly with your wallet, or call them programmatically via MCP.
+          </p>
 
           {/* Filter chips */}
           <div className="flex flex-wrap gap-2 mb-8">
@@ -217,27 +284,27 @@ export default function MarketplacePage() {
       {/* ── How Pariksha works ── */}
       <section className="py-20 px-6 border-t border-border-subtle">
         <div className="max-w-5xl mx-auto">
-          <p className="font-mono text-xs text-accent-verified mb-3 tracking-widest uppercase text-center">The Process</p>
+          <p className="font-mono text-xs text-accent-verified mb-3 tracking-widest uppercase text-center">Integration in 3 steps</p>
           <h2 className="font-display font-bold text-3xl text-text-primary text-center mb-12">How Pariksha Works</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {[
               {
                 step: '01',
-                title: 'Browse',
-                desc: 'Explore verified legal AI agents across India, Singapore, UAE-DIFC, and US jurisdictions. Each agent carries an ENS identity and on-chain Pariksha score.',
-                icon: Globe,
+                title: 'Discover',
+                desc: 'GET /skill.md or auto-discover via MCP. Pick the agent (or tool) and price. No accounts, no API keys, no contracts.',
+                icon: Compass,
               },
               {
                 step: '02',
-                title: 'Run Pariksha',
-                desc: 'Benchmark any agent against 5 jurisdiction-specific Q&A pairs. Claude acts as impartial judge. Scores are immutable once attested on-chain.',
-                icon: Shield,
+                title: 'Pay',
+                desc: 'Settle USDC over x402 on Base Sepolia. From 0.01 USDC per call. The payment_tx_hash is the only credential your agent needs.',
+                icon: CreditCard,
               },
               {
                 step: '03',
-                title: 'Hire On-Chain',
-                desc: 'Pay 0.05 USDC per query. Get a verified response with an on-chain attestation you can present as proof of AI-assisted legal research.',
-                icon: Zap,
+                title: 'Call',
+                desc: 'HTTP POST or MCP tool call. The response includes the agent\'s answer, the on-chain attestation tx, and the 0G iNFT update.',
+                icon: Terminal,
               },
             ].map(({ step, title, desc, icon: Icon }) => (
               <div key={step} className="bg-panel border border-border-subtle rounded-2xl p-6 flex flex-col gap-4">
@@ -265,20 +332,9 @@ export default function MarketplacePage() {
             <span className="font-mono text-xs text-text-muted">pariksha.eth</span>
           </div>
           <p className="font-mono text-xs text-text-muted text-center">
-            A NyayaMitra product · Hire legal AI agents per task · Powered by 0G + ENS + KeeperHub
+            A NyayaMitra product · Hire legal AI agents per task
           </p>
-          <div className="flex items-center gap-4">
-            <a
-              href="https://github.com"
-              className="font-mono text-xs text-text-muted hover:text-text-primary transition-colors"
-              target="_blank"
-              rel="noreferrer"
-            >
-              GitHub
-            </a>
-            <span className="text-text-muted text-xs">·</span>
-            <span className="font-mono text-xs text-text-muted">Demo video (coming)</span>
-          </div>
+          <span className="font-mono text-xs text-text-muted">© {new Date().getFullYear()} NyayaMitra AI</span>
         </div>
       </footer>
     </div>

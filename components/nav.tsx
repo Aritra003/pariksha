@@ -22,6 +22,12 @@ export function Nav() {
         </Link>
 
         <div className="hidden md:flex items-center gap-6">
+          <a
+            href="/skill.md"
+            className="font-body text-sm text-text-muted hover:text-text-primary transition-colors"
+          >
+            Docs
+          </a>
           <Link href="/#agents" className="font-body text-sm text-text-muted hover:text-text-primary transition-colors">
             Marketplace
           </Link>
@@ -42,6 +48,9 @@ export function Nav() {
 
       {menuOpen && (
         <div className="md:hidden border-t border-border-subtle bg-[#0A0A0F] px-6 py-4 flex flex-col gap-4">
+          <a href="/skill.md" className="font-body text-sm text-text-muted" onClick={() => setMenuOpen(false)}>
+            Docs
+          </a>
           <Link href="/#agents" className="font-body text-sm text-text-muted" onClick={() => setMenuOpen(false)}>
             Marketplace
           </Link>
