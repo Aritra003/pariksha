@@ -47,11 +47,13 @@ async function getAgentByEns(ensName: string) {
   if (!ensName) return null
   const { data } = await supabaseAdmin
     .from('agents')
-    .select('ens_name, jurisdiction, system_prompt, price_usdc, inft_token_id, owner_address')
+    .select('ens_name, jurisdiction, system_prompt, price_usdc, inft_token_id, owner_address, status')
     .eq('ens_name', ensName)
     .single()
   return data
 }
+
+const HIRE_BLOCKED_STATUSES = new Set(['pending_review', 'trust_failed', 'archived'])
 
 async function callUpstream(
   agentSlug: string,
@@ -195,6 +197,22 @@ export async function POST(
   }
 
   // ── Paid mode — verify payment and record on-chain ────────────────────────
+  // Block hires on agents that haven't passed trust review.
+  if (agentRow?.status && HIRE_BLOCKED_STATUSES.has(agentRow.status)) {
+    return NextResponse.json(
+      {
+        error: `Agent is not hireable. Status: ${agentRow.status}.`,
+        reason:
+          agentRow.status === 'pending_review'
+            ? 'Trust review in progress.'
+            : agentRow.status === 'trust_failed'
+            ? 'Agent failed trust review.'
+            : 'Agent archived.',
+      },
+      { status: 403 }
+    )
+  }
+
   const buyerAddress = buyer_wallet ?? buyer_address ?? ''
   const priceUsdc = agentRow?.price_usdc ?? 0.05
 

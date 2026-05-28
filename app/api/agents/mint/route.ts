@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { ethers } from 'ethers'
 import { supabaseAdmin } from '@/lib/supabase'
 import { INFT_ABI, CONTRACT_ADDRESSES } from '@/lib/contracts/abis'
+import { scanSystemPrompt, type TrustScanResult } from '@/lib/trust-scan'
 
 export const dynamic = 'force-dynamic'
 
@@ -82,7 +83,31 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: `ENS ${ensName} is already taken` }, { status: 409 })
   }
 
-  // Mint iNFT on 0G Galileo
+  // ── Trust gate (prompt-safety scan) ───────────────────────────────────────
+  let scan: TrustScanResult
+  try {
+    scan = await scanSystemPrompt(systemPrompt, jurisdiction, specialty)
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err)
+    console.error('[agents/mint] trust scan failed:', msg)
+    return NextResponse.json(
+      { error: 'Trust scan unavailable. Please retry.' },
+      { status: 503 }
+    )
+  }
+
+  if (!scan.passed) {
+    return NextResponse.json(
+      {
+        error: 'System prompt failed the trust review.',
+        issues: scan.issues,
+        framework_checks: scan.frameworkChecks,
+      },
+      { status: 422 }
+    )
+  }
+
+  // ── On-chain mint ────────────────────────────────────────────────────────
   const pk = process.env.DEPLOYER_PRIVATE_KEY
   if (!pk) {
     return NextResponse.json({ error: 'Backend signer not configured' }, { status: 503 })
@@ -108,7 +133,6 @@ export async function POST(request: NextRequest) {
     const receipt = await tx.wait()
     txHash = tx.hash
 
-    // Extract tokenId from ERC-721 Transfer event (from=0x0)
     const transferSig = ethers.id('Transfer(address,address,uint256)')
     const zeroTopic = ethers.zeroPadValue('0x00', 32)
     const mintLog = receipt?.logs.find(
@@ -117,7 +141,6 @@ export async function POST(request: NextRequest) {
     if (mintLog) {
       tokenId = Number(BigInt(mintLog.topics[3]))
     } else {
-      // Fallback: totalSupply - 1
       const ts: bigint = await contract['totalSupply']()
       tokenId = Number(ts) - 1
     }
@@ -127,7 +150,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: `On-chain mint failed: ${msg}` }, { status: 500 })
   }
 
-  // Insert agent into Supabase
+  // Insert agent into Supabase with pending_review status
   const { error: insertErr } = await supabaseAdmin.from('agents').insert({
     ens_name: ensName,
     display_name: agentName,
@@ -139,8 +162,7 @@ export async function POST(request: NextRequest) {
     inft_token_id: tokenId,
     inft_address: CONTRACT_ADDRESSES.inft,
     backend_endpoint: 'https://pariksha-brown.vercel.app/api/proxy/anthropic-fallback',
-    status: 'community_minted',
-    minted_by_user: true,
+    status: 'pending_review',
     total_pariksha_runs: 0,
     total_hires: 0,
     current_score: null,
@@ -148,16 +170,37 @@ export async function POST(request: NextRequest) {
 
   if (insertErr) {
     console.error('[agents/mint] Supabase insert error:', insertErr.message)
-    // Token is already minted on-chain — return partial success so user can record the tx
     return NextResponse.json({
       ensName,
       tokenId,
       txHash,
+      status: 'pending_review',
       warning: 'Agent minted on-chain but DB record failed. Contact support with your tx hash.',
     })
   }
 
+  // Record the prompt-safety pass into trust_reviews; benchmark gate comes next.
+  await supabaseAdmin.from('trust_reviews').insert({
+    agent_ens: ensName,
+    prompt_safety_passed: true,
+    prompt_safety_issues: scan.issues,
+    prompt_safety_scan_model: scan.scanModel,
+    framework_checks: scan.frameworkChecks,
+    outcome: 'pending',
+    outcome_reason: 'Prompt-safety scan passed. Awaiting benchmark gate.',
+  })
+
   console.log(`[agents/mint] Minted ${ensName} (token #${tokenId}) for ${ownerAddress} — tx: ${txHash}`)
 
-  return NextResponse.json({ ensName, tokenId, txHash })
+  return NextResponse.json({
+    ensName,
+    tokenId,
+    txHash,
+    status: 'pending_review',
+    trust_scan: {
+      passed: true,
+      warnings: scan.issues.filter((i) => i.severity === 'warn'),
+      framework_checks: scan.frameworkChecks,
+    },
+  })
 }

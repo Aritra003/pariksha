@@ -105,6 +105,162 @@ const TOOLS = [
       required: ['question'],
     },
   },
+  // ── Workflow tools (Priority A: NyayaMitra-style named workflows) ─────────
+  // These tools are task-scoped (vs jurisdiction-scoped). They return structured
+  // JSON output with a known schema. Each is more expensive than a generalist
+  // legal_research call because workflow tools produce legal instruments
+  // (notices, complaints, drafts) with statutory citation discipline.
+  {
+    name: 'cheque_bounce_notice',
+    description:
+      'Draft a Section 138 NI Act demand notice for a bounced cheque. India only. Returns structured JSON with notice_text, statutory_basis, limitation_deadline, signature_block. 0.15 USDC per call, settled via x402 on Base Sepolia.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        cheque_details: {
+          type: 'object',
+          description: 'The cheque under dispute.',
+          properties: {
+            drawer: { type: 'string', description: 'Name of the cheque drawer.' },
+            payee: { type: 'string', description: 'Name of the payee.' },
+            amount_inr: { type: 'number', description: 'Cheque amount in INR.' },
+            cheque_date: { type: 'string', description: 'Cheque date (YYYY-MM-DD).' },
+            bank: { type: 'string', description: 'Drawer bank name.' },
+            return_reason: { type: 'string', description: 'Bank return memo reason (e.g., "insufficient funds").' },
+          },
+          required: ['drawer', 'payee', 'amount_inr', 'cheque_date', 'bank'],
+        },
+        payee_address: { type: 'string', description: 'Postal address of the payee for the notice header.' },
+        notice_date: { type: 'string', description: 'Date the notice will be issued (YYYY-MM-DD).' },
+        payment_tx_hash: { type: 'string', description: 'USDC transfer tx hash on Base Sepolia. Omit for demo mode.' },
+      },
+      required: ['cheque_details', 'payee_address', 'notice_date'],
+    },
+  },
+  {
+    name: 'rera_complaint',
+    description:
+      'Build a RERA complaint draft against a builder/promoter for delay, possession, or refund grievances. India only. Returns structured JSON with complaint_draft, rera_section_refs, jurisdiction_state_rera. 0.20 USDC per call, settled via x402 on Base Sepolia.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        project_id: { type: 'string', description: 'RERA project registration number.' },
+        state: {
+          type: 'string',
+          enum: ['Delhi', 'Maharashtra', 'Karnataka', 'Tamil Nadu', 'UP', 'Haryana', 'Telangana', 'Gujarat', 'Other'],
+          description: 'State whose RERA Authority has jurisdiction.',
+        },
+        grievance_type: {
+          type: 'string',
+          enum: ['delay-in-possession', 'refund', 'defects', 'misrepresentation', 'fee-dispute', 'other'],
+          description: 'Category of grievance.',
+        },
+        complainant_details: {
+          type: 'object',
+          properties: {
+            name: { type: 'string' },
+            address: { type: 'string' },
+            unit_details: { type: 'string', description: 'Tower/floor/unit details.' },
+          },
+          required: ['name'],
+        },
+        relief_sought: { type: 'string', description: 'Specific relief sought (e.g. "refund with interest @ MCLR+2%, costs").' },
+        payment_tx_hash: { type: 'string', description: 'USDC transfer tx hash on Base Sepolia. Omit for demo mode.' },
+      },
+      required: ['project_id', 'state', 'grievance_type', 'complainant_details', 'relief_sought'],
+    },
+  },
+  {
+    name: 'stamp_duty_calc',
+    description:
+      'Calculate Indian stamp duty and registration fee for an instrument, with state-specific rates. India only. Returns structured JSON with stamp_duty_inr, registration_fee_inr, statutory_basis. 0.10 USDC per call, settled via x402 on Base Sepolia.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        instrument_type: {
+          type: 'string',
+          enum: ['sale-deed', 'lease', 'gift', 'mortgage', 'power-of-attorney', 'agreement-to-sell', 'partition', 'other'],
+          description: 'Type of instrument.',
+        },
+        state: { type: 'string', description: 'State where the instrument will be registered.' },
+        consideration_amount_inr: { type: 'number', description: 'Stated consideration / value in INR.' },
+        parties: {
+          type: 'object',
+          properties: {
+            executant: { type: 'string' },
+            recipient: { type: 'string' },
+          },
+        },
+        execution_date: { type: 'string', description: 'Expected execution date (YYYY-MM-DD).' },
+        payment_tx_hash: { type: 'string', description: 'USDC transfer tx hash on Base Sepolia. Omit for demo mode.' },
+      },
+      required: ['instrument_type', 'state', 'consideration_amount_inr'],
+    },
+  },
+  {
+    name: 'msme_vendor_review',
+    description:
+      'Review a vendor agreement for MSME Act compliance (Sections 15-18), payment terms, and dispute clause. India only. Returns structured JSON with msme_act_compliance_issues, section_15_18_findings, recommended_amendments, risk_summary. 0.20 USDC per call, settled via x402 on Base Sepolia.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        contract_text: { type: 'string', description: 'Full text of the vendor agreement.', maxLength: 8000 },
+        vendor_role: { type: 'string', enum: ['buyer', 'seller'], description: 'Whether the requesting party is the buyer or seller in this vendor relationship.' },
+        dispute_clause_check: { type: 'boolean', description: 'Whether to specifically flag MSEFC vs. court vs. arbitration dispute-resolution clause issues.', default: true },
+        payment_tx_hash: { type: 'string', description: 'USDC transfer tx hash on Base Sepolia. Omit for demo mode.' },
+      },
+      required: ['contract_text', 'vendor_role'],
+    },
+  },
+  {
+    name: 'cross_border_nda_triage',
+    description:
+      'Triage a cross-border NDA across IN/SG/AE-DIFC jurisdictions: governing law, conflict clauses, and data-protection compliance under DPDP/PDPA/DIFC DP Law. Returns structured JSON with governing_law_recommendation, conflict_clauses, dp_compliance_by_jurisdiction, enforceability_risks_by_jurisdiction. 0.25 USDC per call, settled via x402 on Base Sepolia.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        nda_text: { type: 'string', description: 'Full text of the NDA.', maxLength: 8000 },
+        jurisdictions: {
+          type: 'array',
+          description: 'Jurisdictions in scope for the triage. Must include at least two.',
+          items: { type: 'string', enum: ['IN', 'SG', 'AE-DIFC'] },
+          minItems: 2,
+        },
+        data_protection_check: { type: 'boolean', description: 'Whether to specifically check personal-data clauses against DPDP / PDPA / DIFC DP Law.', default: true },
+        payment_tx_hash: { type: 'string', description: 'USDC transfer tx hash on Base Sepolia. Omit for demo mode.' },
+      },
+      required: ['nda_text', 'jurisdictions'],
+    },
+  },
+  {
+    name: 'gst_notice_response',
+    description:
+      'Draft a response to a GST department notice (SCN/DRC-01/ASMT-10). India only. Returns structured JSON with response_draft, cgst_section_refs, response_deadline, supporting_docs_required, escalation_path. 0.15 USDC per call, settled via x402 on Base Sepolia.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        notice_type: {
+          type: 'string',
+          enum: ['SCN', 'DRC-01', 'DRC-01A', 'ASMT-10', 'ASMT-11', 'GSTR-3A', 'other'],
+          description: 'Type of GST notice received.',
+        },
+        notice_text: { type: 'string', description: 'Full text of the notice received.' },
+        taxpayer_details: {
+          type: 'object',
+          properties: {
+            gstin: { type: 'string', description: 'GSTIN of the taxpayer.' },
+            legal_name: { type: 'string' },
+            state: { type: 'string' },
+            fy: { type: 'string', description: 'Financial year in question (e.g. 2024-25).' },
+          },
+          required: ['gstin', 'legal_name', 'fy'],
+        },
+        dispute_grounds: { type: 'string', description: 'Taxpayer\'s stated grounds for disputing or responding to the notice.' },
+        payment_tx_hash: { type: 'string', description: 'USDC transfer tx hash on Base Sepolia. Omit for demo mode.' },
+      },
+      required: ['notice_type', 'notice_text', 'taxpayer_details', 'dispute_grounds'],
+    },
+  },
 ]
 
 // ── Agent ENS mapping ────────────────────────────────────────────────────
@@ -125,6 +281,32 @@ function vidhiEnsForJurisdiction(jurisdiction: string): string | null {
   if (j === 'IL') return 'tel-aviv.il.pariksha.eth'
   if (j === 'EU') return 'eu.pariksha.eth'
   return null
+}
+
+// Named-workflow → ENS mapping. Workflows are task-scoped, not jurisdiction-scoped.
+const WORKFLOW_ENS: Record<string, string> = {
+  cheque_bounce_notice: 'cheque-bounce.in.pariksha.eth',
+  rera_complaint: 'rera-complaint.in.pariksha.eth',
+  stamp_duty_calc: 'stamp-duty.in.pariksha.eth',
+  msme_vendor_review: 'msme-vendor.in.pariksha.eth',
+  cross_border_nda_triage: 'cross-border-nda.pariksha.eth',
+  gst_notice_response: 'gst-notice.in.pariksha.eth',
+}
+
+// Per-workflow prices (USDC). Embedded as the source of truth — the tool
+// description text is for human/LLM clients, but the proxy layer reads price
+// from the agents table at hire time.
+const WORKFLOW_PRICE_USDC: Record<string, number> = {
+  cheque_bounce_notice: 0.15,
+  rera_complaint: 0.20,
+  stamp_duty_calc: 0.10,
+  msme_vendor_review: 0.20,
+  cross_border_nda_triage: 0.25,
+  gst_notice_response: 0.15,
+}
+
+function isWorkflowTool(name: string): boolean {
+  return name in WORKFLOW_ENS
 }
 
 // ── Demo-mode rate limit (durable, Supabase-backed) ──────────────────────
@@ -293,6 +475,21 @@ async function executeTool(req: NextRequest, name: string, args: Record<string, 
         ensName: ens,
         payment_tx_hash: paymentTxHash,
       }
+    } else if (isWorkflowTool(name)) {
+      // Workflow tools: route by tool name to its dedicated workflow ENS.
+      // The agent system_prompt (set at mint time) instructs the model to
+      // produce structured JSON output matching the tool's documented schema.
+      ens = WORKFLOW_ENS[name]
+      slug = name.replace(/_/g, '-')
+      const inputs = { ...args }
+      delete inputs.payment_tx_hash
+      const query = `Workflow: ${name}\nInputs (JSON):\n${JSON.stringify(inputs, null, 2)}\n\nProduce structured JSON output matching the documented schema for this workflow. Do not include markdown fences.`
+      proxyBody = {
+        query,
+        jurisdiction: 'IN',
+        ensName: ens,
+        payment_tx_hash: paymentTxHash,
+      }
     } else {
       return {
         content: [{ type: 'text', text: `Unknown tool: ${name}` }],
@@ -393,7 +590,12 @@ export async function GET() {
     protocol: 'MCP 2025-03-26',
     transport: 'http-jsonrpc',
     endpoint: 'POST /api/mcp',
-    tools: TOOLS.map((t) => ({ name: t.name, description: t.description })),
+    tools: TOOLS.map((t) => ({
+      name: t.name,
+      description: t.description,
+      price_usdc: WORKFLOW_PRICE_USDC[t.name] ?? null,
+      category: isWorkflowTool(t.name) ? 'workflow' : 'generalist',
+    })),
     payment: {
       protocol: 'x402',
       chain: 'base-sepolia',
