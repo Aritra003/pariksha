@@ -1,8 +1,8 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import Link from 'next/link'
-import { ArrowLeft, CheckCircle2, ExternalLink } from 'lucide-react'
+import { ArrowLeft, CheckCircle2, ExternalLink, ShieldCheck, ShieldAlert, Loader2 } from 'lucide-react'
 import { useAccount } from 'wagmi'
 import { ConnectButton } from '@rainbow-me/rainbowkit'
 import { Nav } from '@/components/nav'
@@ -25,7 +25,31 @@ function slugify(name: string) {
   return name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 30)
 }
 
-type MintResult = { ensName: string; tokenId: number; txHash: string; warning?: string }
+type MintResult = {
+  ensName: string
+  tokenId: number
+  txHash: string
+  status?: string
+  warning?: string
+  trust_scan?: {
+    passed: boolean
+    warnings: { code: string; message: string }[]
+    framework_checks: Record<string, boolean>
+  }
+}
+
+type TrustReviewOutcome = {
+  outcome: 'passed' | 'failed'
+  benchmark_score: number
+  threshold: number
+  new_status: string
+  badge_tx_hash: string | null
+}
+
+type MintError = {
+  message: string
+  issues?: { code: string; severity: string; message: string }[]
+}
 
 export default function MintPage() {
   const { address, isConnected } = useAccount()
@@ -37,8 +61,11 @@ export default function MintPage() {
   const [priceUsdc, setPriceUsdc] = useState(0.05)
 
   const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
+  const [error, setError] = useState<MintError | null>(null)
   const [result, setResult] = useState<MintResult | null>(null)
+  const [trustReview, setTrustReview] = useState<TrustReviewOutcome | null>(null)
+  const [trustReviewRunning, setTrustReviewRunning] = useState(false)
+  const [trustReviewError, setTrustReviewError] = useState<string | null>(null)
 
   const ensPreview = useMemo(() => {
     const slug = slugify(agentName)
@@ -62,7 +89,7 @@ export default function MintPage() {
     if (!isValid || !address) return
 
     setLoading(true)
-    setError('')
+    setError(null)
 
     try {
       const res = await fetch('/api/agents/mint', {
@@ -81,32 +108,82 @@ export default function MintPage() {
       const data = await res.json()
 
       if (!res.ok) {
-        setError(data.error ?? 'Mint failed. Please try again.')
+        setError({
+          message: data.error ?? 'Mint failed. Please try again.',
+          issues: data.issues,
+        })
       } else {
         setResult(data)
       }
     } catch {
-      setError('Network error. Please try again.')
+      setError({ message: 'Network error. Please try again.' })
     } finally {
       setLoading(false)
     }
   }
 
+  // Auto-trigger trust review after successful mint
+  useEffect(() => {
+    if (!result || result.status !== 'pending_review' || trustReview || trustReviewRunning) return
+    setTrustReviewRunning(true)
+    setTrustReviewError(null)
+    fetch(`/api/agents/${encodeURIComponent(result.ensName)}/trust-review`, { method: 'POST' })
+      .then(async (r) => {
+        const data = await r.json()
+        if (!r.ok) {
+          setTrustReviewError(data.error ?? 'Trust review failed.')
+        } else {
+          setTrustReview(data)
+        }
+      })
+      .catch(() => setTrustReviewError('Trust review network error.'))
+      .finally(() => setTrustReviewRunning(false))
+  }, [result, trustReview, trustReviewRunning])
+
   if (result) {
+    const reviewPassed = trustReview?.outcome === 'passed'
+    const reviewFailed = trustReview?.outcome === 'failed'
+
+    const headlineIcon = reviewPassed ? (
+      <ShieldCheck size={40} className="text-accent-verified" />
+    ) : reviewFailed ? (
+      <ShieldAlert size={40} className="text-red-400" />
+    ) : trustReviewRunning ? (
+      <Loader2 size={40} className="text-accent-verified animate-spin" />
+    ) : (
+      <CheckCircle2 size={40} className="text-accent-verified" />
+    )
+
+    const headlineText = reviewPassed
+      ? 'Agent Verified & Live'
+      : reviewFailed
+      ? 'Agent Minted — Trust Review Failed'
+      : trustReviewRunning
+      ? 'Reviewing Agent…'
+      : 'Agent Minted'
+
+    const headlineSub = reviewPassed
+      ? 'Trust-reviewed and listed in the marketplace.'
+      : reviewFailed
+      ? 'Agent minted on-chain but is hidden from the marketplace.'
+      : trustReviewRunning
+      ? 'Running benchmark gate. This takes ~30 seconds.'
+      : 'Your legal AI agent is minted on 0G Galileo. Trust review starting…'
+
+    const borderClass = reviewFailed
+      ? 'border-red-400/30'
+      : 'border-accent-verified/30'
+
     return (
       <div className="min-h-screen pb-20" style={{ backgroundColor: '#0A0A0F' }}>
         <Nav />
         <div className="pt-32 px-6 max-w-2xl mx-auto">
-          <div className="bg-panel border border-accent-verified/30 rounded-2xl p-8 text-center">
-            <div className="flex justify-center mb-4">
-              <CheckCircle2 size={40} className="text-accent-verified" />
-            </div>
+          <div className={`bg-panel border ${borderClass} rounded-2xl p-8 text-center`}>
+            <div className="flex justify-center mb-4">{headlineIcon}</div>
             <h1 className="font-display font-bold text-2xl text-text-primary mb-2">
-              Agent Minted
+              {headlineText}
             </h1>
-            <p className="font-body text-sm text-text-muted mb-6">
-              Your legal AI agent is now live on 0G Galileo.
-            </p>
+            <p className="font-body text-sm text-text-muted mb-6">{headlineSub}</p>
 
             <div className="bg-white/5 rounded-xl p-4 text-left font-mono text-xs space-y-2 mb-6">
               <div className="flex justify-between">
@@ -129,11 +206,56 @@ export default function MintPage() {
                   <ExternalLink size={10} />
                 </a>
               </div>
+              {trustReview && (
+                <>
+                  <div className="flex justify-between">
+                    <span className="text-text-muted">Benchmark</span>
+                    <span className={reviewPassed ? 'text-accent-verified' : 'text-red-400'}>
+                      {trustReview.benchmark_score.toFixed(1)} / 100 (threshold {trustReview.threshold})
+                    </span>
+                  </div>
+                  {trustReview.badge_tx_hash && (
+                    <div className="flex justify-between items-center">
+                      <span className="text-text-muted">TRUST_REVIEWED badge</span>
+                      <a
+                        href={`https://chainscan-galileo.0g.ai/tx/${trustReview.badge_tx_hash}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-text-primary hover:text-accent-verified flex items-center gap-1 transition-colors"
+                      >
+                        {trustReview.badge_tx_hash.slice(0, 10)}…{trustReview.badge_tx_hash.slice(-6)}
+                        <ExternalLink size={10} />
+                      </a>
+                    </div>
+                  )}
+                </>
+              )}
             </div>
 
             {result.warning && (
               <p className="font-mono text-xs text-yellow-400 bg-yellow-400/10 rounded-xl px-4 py-3 mb-6">
                 ⚠ {result.warning}
+              </p>
+            )}
+            {result.trust_scan?.warnings && result.trust_scan.warnings.length > 0 && (
+              <div className="font-mono text-xs text-yellow-400/80 bg-yellow-400/5 rounded-xl px-4 py-3 mb-6 text-left">
+                <p className="text-yellow-400 mb-2 font-semibold">Prompt-safety warnings (non-blocking):</p>
+                <ul className="list-disc list-inside space-y-1">
+                  {result.trust_scan.warnings.map((w) => (
+                    <li key={w.code}>{w.message}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+            {trustReviewError && (
+              <p className="font-mono text-xs text-yellow-400 bg-yellow-400/10 rounded-xl px-4 py-3 mb-6">
+                ⚠ Trust review error: {trustReviewError}
+              </p>
+            )}
+            {reviewFailed && (
+              <p className="font-mono text-xs text-red-400/90 bg-red-400/5 rounded-xl px-4 py-3 mb-6 text-left">
+                Benchmark score {trustReview.benchmark_score.toFixed(1)} is below the trust-pass threshold ({trustReview.threshold}).
+                The agent is minted on-chain but hidden from the public marketplace. Revise the system prompt and re-mint.
               </p>
             )}
 
@@ -310,9 +432,18 @@ export default function MintPage() {
 
             {/* Error */}
             {error && (
-              <p className="font-mono text-xs text-red-400 bg-red-400/10 rounded-xl px-4 py-3">
-                {error}
-              </p>
+              <div className="font-mono text-xs text-red-400 bg-red-400/10 rounded-xl px-4 py-3">
+                <p>{error.message}</p>
+                {error.issues && error.issues.length > 0 && (
+                  <ul className="list-disc list-inside mt-2 space-y-1 text-red-400/90">
+                    {error.issues.map((i) => (
+                      <li key={i.code}>
+                        <span className="opacity-70">[{i.severity}]</span> {i.message}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
             )}
 
             {/* Submit */}

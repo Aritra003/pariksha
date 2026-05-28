@@ -52,3 +52,9 @@ next-env.d.ts
 .vercel
 node_modules
 .burn-rate/
+
+# Local scratch / diagnostic scripts (probes, env debug, one-shot SQL helpers)
+scripts/_*
+
+# Supabase CLI scratch
+supabase/.temp/

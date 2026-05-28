@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowLeft, ExternalLink, Copy, Check, ChevronDown, ChevronUp, RefreshCw } from 'lucide-react'
+import { ArrowLeft, ExternalLink, Copy, Check, ChevronDown, ChevronUp, RefreshCw, ShieldAlert, ShieldQuestion } from 'lucide-react'
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
 } from 'recharts'
@@ -157,6 +157,30 @@ export default function AgentProfilePage() {
           <ArrowLeft size={14} /> Marketplace
         </Link>
 
+        {/* ── Trust review banner ── */}
+        {agent.status === 'pending_review' && (
+          <div className="bg-yellow-400/10 border border-yellow-400/30 rounded-2xl p-5 mb-6 flex items-start gap-3">
+            <ShieldQuestion size={20} className="text-yellow-400 shrink-0 mt-0.5" />
+            <div className="flex-1">
+              <p className="font-display font-semibold text-yellow-400 mb-1">Trust Review In Progress</p>
+              <p className="font-mono text-xs text-text-muted leading-relaxed">
+                This agent passed the prompt-safety scan and is awaiting the benchmark gate. It is hidden from the public marketplace until review completes.
+              </p>
+            </div>
+          </div>
+        )}
+        {agent.status === 'trust_failed' && (
+          <div className="bg-red-400/10 border border-red-400/30 rounded-2xl p-5 mb-6 flex items-start gap-3">
+            <ShieldAlert size={20} className="text-red-400 shrink-0 mt-0.5" />
+            <div className="flex-1">
+              <p className="font-display font-semibold text-red-400 mb-1">Trust Review Failed</p>
+              <p className="font-mono text-xs text-text-muted leading-relaxed">
+                This agent did not meet the trust-pass benchmark threshold. It is minted on-chain but hidden from the public marketplace and not hireable. The owner may revise the system prompt and re-mint a new agent.
+              </p>
+            </div>
+          </div>
+        )}
+
         {/* ── Hero ── */}
         <div className="bg-panel border border-border-subtle rounded-2xl p-8 mb-6">
           <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-6">
@@ -185,12 +209,25 @@ export default function AgentProfilePage() {
               >
                 Run Pariksha (free)
               </Link>
-              <Link
-                href={`/hire/${encodeURIComponent(ens)}`}
-                className="font-mono text-sm font-medium px-5 py-2.5 rounded-xl bg-accent-verified/10 border border-accent-verified/30 text-accent-verified hover:bg-accent-verified/20 transition-all text-center focus:outline-none focus-visible:ring-1 focus-visible:ring-accent-verified"
-              >
-                Hire · ${agent.price_usdc.toFixed(2)} USDC
-              </Link>
+              {agent.status === 'pending_review' || agent.status === 'trust_failed' ? (
+                <span
+                  className="font-mono text-sm font-medium px-5 py-2.5 rounded-xl bg-white/5 border border-border-subtle text-text-muted text-center cursor-not-allowed"
+                  title={
+                    agent.status === 'pending_review'
+                      ? 'Hire disabled until trust review completes.'
+                      : 'Hire disabled — agent failed trust review.'
+                  }
+                >
+                  Hire · disabled
+                </span>
+              ) : (
+                <Link
+                  href={`/hire/${encodeURIComponent(ens)}`}
+                  className="font-mono text-sm font-medium px-5 py-2.5 rounded-xl bg-accent-verified/10 border border-accent-verified/30 text-accent-verified hover:bg-accent-verified/20 transition-all text-center focus:outline-none focus-visible:ring-1 focus-visible:ring-accent-verified"
+                >
+                  Hire · ${agent.price_usdc.toFixed(2)} USDC
+                </Link>
+              )}
             </div>
           </div>
 
