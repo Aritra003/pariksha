@@ -256,6 +256,18 @@ visible rather than papered over. **±8 on partial-error penalty severity,
 directional signal preserved** is the working characterisation of judge noise
 under the v1.1.0 engine.
 
+**Known limitation — prompt-anchor cross-contamination.** During Korea
+benchmarking we observed that a statutory-anchor block added to fix a
+specific failure mode (Commercial Act Art. 397 vs Art. 398 conflation) can
+degrade the agent's performance on *unrelated* questions touching adjacent
+statutes — in our case Civil Act Art. 750 (tort liability) collapsed from a
+stable 92 to 5 under a 1000-character anchor focused on Commercial Act
+director duties. The anchor's structured Trigger/Approval/Breach matrices
+appear to draw enough attention weight that the model sometimes tries to
+force unrelated questions into the same framing. Anchor remediation works
+cleanly for self-contained statutory regimes (e.g. EW Arbitration Act s.69)
+but requires scope-isolation when adjacent statutes share doctrinal space.
+
 ## 8. Acknowledgments
 
 Pariksha is built on Anthropic's open-source Claude for Legal framework
