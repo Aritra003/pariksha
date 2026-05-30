@@ -213,6 +213,20 @@ the 0G Galileo testnet.
    pleadings). A drafting subset is a planned v1.2.0 addition.
 4. **No multi-turn evaluation.** All questions are single-turn. Legal practice
    is conversational; multi-turn evaluation is a clear gap.
+5. **Confabulation on statutory subsections — stable penalty magnitude across
+   distinct wrong answers.** Observed on the EU agent against DSA Article 17
+   (eu-003): when the agent lacks specific knowledge of an exemption subsection,
+   it produces plausible-but-wrong cross-references to *adjacent* articles
+   (Art 22, Art 8, Art 10, Art 31, or fabricated "6-week republication" rules
+   for an Art 17(2)/17(5) question) — a different fabrication on each sample
+   yet the judge lands within ±10 of the same penalty every time. The
+   directional signal (a partial-knowledge B-grade answer) is stable; the
+   specific defect is sample-dependent. We do not remediate this with a
+   prompt anchor because of the Seoul Art 124 cross-contamination risk noted
+   under §7 v1.1.0 — a tightly scoped anchor on one provision in an interlinked
+   regulatory regime (here GDPR / DSA / DMA) can degrade unrelated questions
+   in the same bank. Confabulation on tail-detail is therefore treated as a
+   capability ceiling rather than a fixable defect at v1.1.0.
 
 ## 7. Engine changelog
 
@@ -255,6 +269,18 @@ band by roughly √3, and reporting min/max/std makes residual judge variance
 visible rather than papered over. **±8 on partial-error penalty severity,
 directional signal preserved** is the working characterisation of judge noise
 under the v1.1.0 engine.
+
+**Known limitation — prompt-anchor cross-contamination.** During Korea
+benchmarking we observed that a statutory-anchor block added to fix a
+specific failure mode (Commercial Act Art. 397 vs Art. 398 conflation) can
+degrade the agent's performance on *unrelated* questions touching adjacent
+statutes — in our case Civil Act Art. 750 (tort liability) collapsed from a
+stable 92 to 5 under a 1000-character anchor focused on Commercial Act
+director duties. The anchor's structured Trigger/Approval/Breach matrices
+appear to draw enough attention weight that the model sometimes tries to
+force unrelated questions into the same framing. Anchor remediation works
+cleanly for self-contained statutory regimes (e.g. EW Arbitration Act s.69)
+but requires scope-isolation when adjacent statutes share doctrinal space.
 
 ## 8. Acknowledgments
 
