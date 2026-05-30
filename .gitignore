@@ -58,3 +58,7 @@ scripts/_*
 
 # Supabase CLI scratch
 supabase/.temp/
+
+# Pariksha public benchmark — source of github.com/Aritra003/pariksha-benchmark
+# (v1.1.0-draft/ stays private until v1.1.0 ships separately)
+pariksha-benchmark/

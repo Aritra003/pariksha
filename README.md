@@ -185,6 +185,10 @@ Pariksha is built by Aritra Sarkhel, founder of NyayaMitra AI (operating under A
 
 ---
 
+> **Benchmark methodology and question banks**: open-sourced at [github.com/Aritra003/pariksha-benchmark](https://github.com/Aritra003/pariksha-benchmark) (Apache 2.0).
+
+---
+
 ## License
 
 MIT — see [LICENSE](LICENSE).
