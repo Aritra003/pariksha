@@ -228,6 +228,29 @@ the 0G Galileo testnet.
    in the same bank. Confabulation on tail-detail is therefore treated as a
    capability ceiling rather than a fixable defect at v1.1.0.
 
+### Findings from legacy re-scoring
+
+Across the seven v1.0.0 single-sample agents re-scored at v1.1.0
+(3-sample-mean methodology) — delhi.in, kosh.in, sahayak.in, vidhi.sg,
+vidhi.ae, vidhi.us, delaware.us — the aggregate mean drift was **−0.71**,
+i.e. single-sample legacy scores were on average ~1 point optimistic.
+Individual deltas spanned **−12.1 to +8.5**, well outside the documented
+±8 judge-noise band, because the larger moves were not noise but
+**specialty / bank mismatches** that single-sample scoring had concealed:
+plain-language QA agents (sahayak.in, declared "explaining Indian law
+accessible to non-lawyers") and citation-verification agents (kosh.in,
+declared "verifying and citing Indian case law") were scored against
+substantive-law banks, and the v1.1.0 3-sample methodology surfaced the
+ceiling honestly where a single sample had landed favourably. Dry-run vs
+apply-run aggregate variance was itself observed to drift by 5+ points
+(vidhi.ae: dry-run std 6.71 / range 12, apply-run std 0.42 / range 0.8 —
+same agent, same bank, two minutes apart) — even N=3 sampling is not
+deterministic at the band level, so per-question variance flags from a
+single run should not be over-interpreted as agent-level defects without
+a multi-run cross-check. See
+[../../docs/_archive/legacy-rescore-v1-1-findings.md](../../docs/_archive/legacy-rescore-v1-1-findings.md)
+for per-agent breakdowns.
+
 ## 7. Engine changelog
 
 ### v1.1.0 — 2026-05-29
